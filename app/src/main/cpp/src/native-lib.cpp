@@ -2,7 +2,9 @@
 #include <oboe/Oboe.h>
 #include <cmath>
 #include <memory>
+#include "Envelope.h"
 #include "SineWaveGenerator.h"
+#include "VectorGenerator.h"
 
 constexpr int kSampleRate = 44100;
 constexpr int kChannelCount = 1;
@@ -18,12 +20,12 @@ public:
      *
      * Configures and opens the audio stream for playback.
      */
-    AudioPlayer(double frequency, double amplitude) :
-            audioConfig{ kSampleRate, kChannelCount },
+    AudioPlayer(Envelope frequency, Envelope amplitude) :
+            audioConfig{kSampleRate, kChannelCount},
             sineWaveGenerator(
                     audioConfig,
-                    frequency,
-                    amplitude
+                    std::move(frequency),
+                    std::move(amplitude)
             ) {
 
         // Configure the audio stream builder
@@ -42,10 +44,12 @@ public:
         }
     }
 
+    void reset()  {
+        sineWaveGenerator.resetState();
+    }
+
     /**
-    * @brief Destroys the AudioPlayer instance.
-    *
-    * Stops and closes the audio stream.
+    * @brief Stops and closes the audio stream.
     */
     ~AudioPlayer() override {
         if (stream != nullptr) {
@@ -91,8 +95,45 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_startPlaying(
         JNIEnv *env,
         jobject /* this */
 ) {
-    const double frequency = 440.0;  // Frequency of the sine wave
-    const double amplitude = 0.5;    // Amplitude of the sine wave
+
+    int one_second = kSampleRate;
+    // Generate linear segments for two Envelopes
+    std::vector<double> envelope1Values = VectorGenerator::generateLinearSegment(
+            0.0,
+            1.0,
+            one_second
+    );
+    std::vector<double> envelope2Values = VectorGenerator::generateLinearSegment(
+            1.0,
+            0.0,
+            one_second
+    );
+
+    std::vector<double> envelope3Values = VectorGenerator::generateLinearSegment(
+            500,
+            1000,
+            one_second
+    );
+    std::vector<double> envelope4Values = VectorGenerator::generateLinearSegment(
+            1000,
+            750,
+            one_second
+    );
+
+    // Create Envelope instances
+    Envelope amplitude(
+            std::move(envelope1Values),
+            std::move(std::vector<double>()),
+            std::move(envelope2Values),
+            true
+    );
+
+    Envelope frequency(
+            std::move(envelope3Values),
+            std::move(std::vector<double>()),
+            std::move(envelope4Values),
+            true
+    );
     audioPlayer = std::make_unique<AudioPlayer>(frequency, amplitude);
 }
 
@@ -101,5 +142,6 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_stopPlaying(
         JNIEnv *env,
         jobject /* this */
 ) {
+    audioPlayer.get()->reset();
     audioPlayer.reset();
 }
