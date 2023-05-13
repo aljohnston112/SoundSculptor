@@ -19,8 +19,9 @@ public:
      *
      * @param outputBuffer Pointer to the output buffer where the generated samples will be written.
      * @param numFrames The number of frames to generate.
+     * @return True if either the amplitude envelope or frequency envelope if at it's end.
      */
-    virtual void generateSamples(float *outputBuffer, int32_t numFrames) = 0;
+    virtual bool generateSamples(float *outputBuffer, int32_t numFrames) = 0;
 
     /**
      * @brief Resets the state of the audio generator.

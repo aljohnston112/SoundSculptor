@@ -21,7 +21,11 @@ public:
      * @param numSamples The number of samples in the linear segment.
      * @return A vector of doubles representing the linear segment.
      */
-    static std::vector<double> generateLinearSegment(double start, double end, int numSamples);
+    static std::shared_ptr<std::vector<double>> generateLinearSegment(
+            double start,
+            double end,
+            int numSamples
+    );
 };
 
 #endif //SOUNDSCULPTOR_VECTORGENERATOR_H

@@ -14,14 +14,13 @@ public:
      * @param release The release phase of the envelope.
      * @param loopSustain Flag indicating whether the sustain phase should loop.
      */
-    Envelope(
-        std::vector<double>&& attack,
-        std::vector<double>&& sustain,
-        std::vector<double>&& release,
-        bool loopSustain = false
+    Envelope(std::shared_ptr<std::vector<double>> attack,
+             std::shared_ptr<std::vector<double>> sustain,
+             std::shared_ptr<std::vector<double>> release,
+             bool loopSustain
     );
 
-    /**
+/**
      * @brief Gets the current value of the envelope.
      *
      * @return The current value of the envelope.
@@ -39,10 +38,12 @@ public:
      */
     void resetState();
 
+    bool finished() const;
+
 private:
-    std::vector<double> attack;
-    std::vector<double> sustain;
-    std::vector<double> release;
+    std::shared_ptr<std::vector<double>> attack;
+    std::shared_ptr<std::vector<double>> sustain;
+    std::shared_ptr<std::vector<double>> release;
     int currentIndex = 0;
     bool loopSustain;
     bool releaseTriggered = false;

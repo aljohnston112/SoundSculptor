@@ -1,140 +1,67 @@
-#include <jni.h>
-#include <oboe/Oboe.h>
-#include <cmath>
-#include <memory>
-#include "Envelope.h"
-#include "SineWaveGenerator.h"
-#include "VectorGenerator.h"
-
-constexpr int kSampleRate = 44100;
-constexpr int kChannelCount = 1;
-
-/**
- * @brief AudioPlayer class that implements the oboe::AudioStreamCallback for audio playback.
- */
-class AudioPlayer : public oboe::AudioStreamCallback {
-public:
-
-    /**
-     * @brief Constructs an AudioPlayer instance.
-     *
-     * Configures and opens the audio stream for playback.
-     */
-    AudioPlayer(Envelope frequency, Envelope amplitude) :
-            audioConfig{kSampleRate, kChannelCount},
-            sineWaveGenerator(
-                    audioConfig,
-                    std::move(frequency),
-                    std::move(amplitude)
-            ) {
-
-        // Configure the audio stream builder
-        builder.setDirection(oboe::Direction::Output)
-                ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-                ->setSharingMode(oboe::SharingMode::Shared)
-                ->setFormat(oboe::AudioFormat::Float)
-                ->setChannelCount(kChannelCount)
-                ->setSampleRate(kSampleRate)
-                ->setCallback(this);
-
-        // Open and start the audio stream
-        oboe::Result result = builder.openStream(stream);
-        if (result == oboe::Result::OK && stream != nullptr) {
-            stream->start();
-        }
-    }
-
-    void reset()  {
-        sineWaveGenerator.resetState();
-    }
-
-    /**
-    * @brief Stops and closes the audio stream.
-    */
-    ~AudioPlayer() override {
-        if (stream != nullptr) {
-            stream->stop();
-            stream->close();
-            stream = nullptr;
-        }
-    }
-
-    /**
-     * @brief Callback function invoked when audio data is needed.
-     *
-     * Generates a sine wave and fills the audioData buffer with the generated samples.
-     *
-     * @param audioStream The audio stream invoking the callback.
-     * @param audioData Pointer to the audio data buffer to fill.
-     * @param numFrames The number of audio frames requested.
-     *
-     * @return DataCallbackResult indicating whether to continue or stop the audio stream.
-     */
-    oboe::DataCallbackResult onAudioReady(
-            oboe::AudioStream *audioStream,
-            void *audioData,
-            int32_t numFrames
-    ) override {
-
-        auto *outputBuffer = static_cast<float *>(audioData);
-        sineWaveGenerator.generateSamples(outputBuffer, numFrames);
-        return oboe::DataCallbackResult::Continue;
-    }
-
-private:
-    AudioConfig audioConfig;
-    SineWaveGenerator sineWaveGenerator;
-    oboe::AudioStreamBuilder builder;
-    std::shared_ptr<oboe::AudioStream> stream;
-};
+#include "../include/AudioPlayer.h"
 
 std::unique_ptr<AudioPlayer> audioPlayer;
+std::unique_ptr<std::vector<std::shared_ptr<Envelope>>> envelopes;
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_MainActivity_startPlaying(
+Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_startPlaying(
         JNIEnv *env,
         jobject /* this */
 ) {
 
     int one_second = kSampleRate;
     // Generate linear segments for two Envelopes
-    std::vector<double> envelope1Values = VectorGenerator::generateLinearSegment(
+    std::shared_ptr<std::vector<double>> envelope1Values = VectorGenerator::generateLinearSegment(
             0.0,
             1.0,
             one_second
     );
-    std::vector<double> envelope2Values = VectorGenerator::generateLinearSegment(
+    std::shared_ptr<std::vector<double>> envelope2Values = VectorGenerator::generateLinearSegment(
             1.0,
             0.0,
             one_second
     );
 
-    std::vector<double> envelope3Values = VectorGenerator::generateLinearSegment(
+    std::shared_ptr<std::vector<double>> envelope3Values = VectorGenerator::generateLinearSegment(
             500,
             1000,
             one_second
     );
-    std::vector<double> envelope4Values = VectorGenerator::generateLinearSegment(
+    std::shared_ptr<std::vector<double>> envelope4Values = VectorGenerator::generateLinearSegment(
             1000,
             750,
             one_second
     );
 
     // Create Envelope instances
-    Envelope amplitude(
-            std::move(envelope1Values),
-            std::move(std::vector<double>()),
-            std::move(envelope2Values),
+    envelopes = std::make_unique<std::vector<std::shared_ptr<Envelope>>>();
+    std::shared_ptr<Envelope> amplitude = std::make_shared<Envelope>(
+            envelope1Values,
+            std::make_shared<std::vector<double>>(),
+            envelope2Values,
             true
     );
+    envelopes->push_back(amplitude);
 
-    Envelope frequency(
-            std::move(envelope3Values),
-            std::move(std::vector<double>()),
-            std::move(envelope4Values),
+    std::shared_ptr<Envelope> frequency = std::make_shared<Envelope>(
+            envelope3Values,
+            std::make_shared<std::vector<double>>(),
+            envelope4Values,
             true
     );
+    envelopes->push_back(frequency);
+
     audioPlayer = std::make_unique<AudioPlayer>(frequency, amplitude);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_triggerRelease(
+        JNIEnv *env,
+        jobject /* this */
+) {
+    for (const std::shared_ptr<Envelope>& envelope: *envelopes) {
+        envelope->triggerRelease();
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -144,4 +71,5 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_stopPlaying(
 ) {
     audioPlayer.get()->reset();
     audioPlayer.reset();
+    envelopes.reset();
 }
