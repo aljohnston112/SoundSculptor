@@ -65,7 +65,7 @@ Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_triggerRelease(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_MainActivity_stopPlaying(
+Java_io_fourth_1finger_sound_1sculptor_TitleFragment_stopPlaying(
         JNIEnv *env,
         jobject /* this */
 ) {

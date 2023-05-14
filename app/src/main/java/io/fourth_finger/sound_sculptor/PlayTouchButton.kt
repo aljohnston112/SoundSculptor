@@ -3,7 +3,6 @@ package io.fourth_finger.sound_sculptor
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.widget.Button
 import androidx.appcompat.widget.AppCompatButton
 
 class PlayTouchButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
@@ -19,7 +18,7 @@ class PlayTouchButton(context: Context, attrs: AttributeSet) : AppCompatButton(c
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 downTouch = true
-                startPlaying();
+                startPlaying()
                 true
             }
 

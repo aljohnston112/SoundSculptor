@@ -1,13 +1,10 @@
 package io.fourth_finger.sound_sculptor
 
 import android.os.Bundle
-import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import io.fourth_finger.sound_sculptor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
-    private external fun stopPlaying()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -16,10 +13,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.stopButton.setOnClickListener {
-            stopPlaying()
-        }
 
     }
 
