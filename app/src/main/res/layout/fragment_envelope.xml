@@ -1,284 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/envelopeTitle"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAttackFunction"
-        app:layout_constraintEnd_toEndOf="@+id/spinnerAttackFunction"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <TextView
-        android:id="@+id/textViewAttackFunction"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/attack_function"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAttackStart"
-        app:layout_constraintStart_toStartOf="@+id/textViewAttackStart"
-        app:layout_constraintTop_toBottomOf="@+id/envelopeTitle"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <Spinner
-        android:id="@+id/spinnerAttackFunction"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewAttackFunction"
-        app:layout_constraintEnd_toEndOf="@+id/editTextAttackStart"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewAttackFunction" />
-
-    <TextView
-        android:id="@+id/textViewAttackStart"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/attack_start"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAttackEnd"
-        app:layout_constraintStart_toStartOf="@+id/textViewAttackEnd"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAttackFunction"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextAttackStart"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/attack_start_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewAttackStart"
-        app:layout_constraintEnd_toEndOf="@+id/editTextAttackEnd"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewAttackStart"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/textViewAttackEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/attack_end"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAttackTime"
-        app:layout_constraintStart_toStartOf="@+id/textViewAttackTime"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAttackStart"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextAttackEnd"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/attack_end_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewAttackEnd"
-        app:layout_constraintEnd_toEndOf="@+id/editTextAttackTime"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewAttackEnd" />
-
-    <TextView
-        android:id="@+id/textViewAttackTime"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/attack_time"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewSustainFunction"
-        app:layout_constraintStart_toStartOf="@+id/textViewSustainFunction"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAttackEnd"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextAttackTime"
-        android:hint="@string/attack_time"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewAttackTime"
-        app:layout_constraintEnd_toEndOf="@+id/spinnerSustainFunction"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewAttackTime" />
-
-    <TextView
-        android:id="@+id/textViewSustainFunction"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/sustain_function"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewSustainEnd"
-        app:layout_constraintStart_toStartOf="@+id/textViewSustainEnd"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAttackTime"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <Spinner
-        android:id="@+id/spinnerSustainFunction"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewSustainFunction"
-        app:layout_constraintEnd_toEndOf="@+id/editTextSustainEnd"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewSustainFunction"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <TextView
-        android:id="@+id/textViewSustainEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/sustain_end"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewSustainTime"
-        app:layout_constraintStart_toStartOf="@+id/textViewSustainTime"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSustainFunction"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextSustainEnd"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/sustain_end_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewSustainEnd"
-        app:layout_constraintEnd_toEndOf="@+id/editTextSustainTime"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewSustainEnd" />
-
-    <TextView
-        android:id="@+id/textViewSustainTime"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/sustain_time"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewReleaseFunction"
-        app:layout_constraintStart_toStartOf="@+id/textViewReleaseFunction"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSustainEnd"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextSustainTime"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/sustain_time_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewSustainTime"
-        app:layout_constraintEnd_toEndOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewSustainTime" />
-
-    <TextView
-        android:id="@+id/textViewReleaseFunction"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/release_function"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewReleaseEnd"
-        app:layout_constraintStart_toStartOf="@+id/textViewReleaseEnd"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSustainTime"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <Spinner
-        android:id="@+id/spinnerReleaseFunction"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewReleaseFunction"
-        app:layout_constraintEnd_toEndOf="@+id/editTextReleaseEnd"
-        app:layout_constraintStart_toEndOf="@id/textViewReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewReleaseFunction" />
-
-    <TextView
-        android:id="@+id/textViewReleaseEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/release_end"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/textViewReleaseTime"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewReleaseFunction"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextReleaseEnd"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/release_end_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewReleaseEnd"
-        app:layout_constraintEnd_toEndOf="@+id/editTextReleaseTime"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewReleaseEnd" />
-
-    <TextView
-        android:id="@+id/textViewReleaseTime"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:padding="16dp"
-        android:text="@string/release_time"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toTopOf="@+id/appCompatButton"
-        app:layout_constraintStart_toStartOf="@+id/textViewReleaseEnd"
-        app:layout_constraintTop_toBottomOf="@+id/textViewReleaseEnd"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <EditText
-        android:id="@+id/editTextReleaseTime"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:autofillHints="notApplicable"
-        android:hint="@string/release_time_hint"
-        android:inputType="number"
-        android:maxWidth="488dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewReleaseTime"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/spinnerReleaseFunction"
-        app:layout_constraintTop_toTopOf="@+id/textViewReleaseTime" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/appCompatButton"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/submit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewReleaseTime"
-        app:layout_constraintVertical_bias="0.5" />
+        android:padding="16dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/envelopeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/amplitude_envelope"
+            app:layout_constraintBottom_toTopOf="@+id/textViewAttackFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewAttackFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            android:text="@string/attack_function"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldAttackStart"
+            app:layout_constraintStart_toStartOf="@+id/filledTextFieldAttackStart"
+            app:layout_constraintTop_toBottomOf="@id/envelopeTitle"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <Spinner
+            android:id="@+id/spinnerAttackFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewAttackFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textViewAttackFunction"
+            app:layout_constraintTop_toTopOf="@+id/textViewAttackFunction" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldAttackStart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/attack_start"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldAttackEnd"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAttackFunction"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldAttackEnd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/attack_end"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldAttackTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldAttackStart"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldAttackTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/attack_time"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewSustainFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldAttackEnd"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewSustainFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            android:text="@string/sustain_function"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldSustainEnd"
+            app:layout_constraintStart_toStartOf="@+id/filledTextFieldSustainTime"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldAttackTime"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <Spinner
+            android:id="@+id/spinnerSustainFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewSustainFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textViewSustainFunction"
+            app:layout_constraintTop_toTopOf="@+id/textViewSustainFunction" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldSustainEnd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/sustain_end"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldSustainTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSustainFunction"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldSustainTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/sustain_time"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@id/textViewReleaseFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldSustainEnd"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewReleaseFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            android:text="@string/release_function"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldReleaseEnd"
+            app:layout_constraintStart_toStartOf="@+id/filledTextFieldReleaseTime"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldSustainTime"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <Spinner
+            android:id="@+id/spinnerReleaseFunction"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewReleaseFunction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textViewReleaseFunction"
+            app:layout_constraintTop_toTopOf="@+id/textViewReleaseFunction" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldReleaseEnd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/release_end"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/filledTextFieldReleaseTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewReleaseFunction"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextFieldReleaseTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/release_time"
+            android:maxWidth="488dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/appCompatButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldReleaseEnd"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/appCompatButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/submit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filledTextFieldReleaseTime"
+            app:layout_constraintVertical_bias="0.5" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

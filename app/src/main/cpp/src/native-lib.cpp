@@ -59,7 +59,7 @@ Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_triggerRelease(
         JNIEnv *env,
         jobject /* this */
 ) {
-    for (const std::shared_ptr<Envelope>& envelope: *envelopes) {
+    for (const std::shared_ptr<Envelope> &envelope: *envelopes) {
         envelope->triggerRelease();
     }
 }
@@ -72,4 +72,52 @@ Java_io_fourth_1finger_sound_1sculptor_TitleFragment_stopPlaying(
     audioPlayer.get()->reset();
     audioPlayer.reset();
     envelopes.reset();
+}
+
+std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
+    std::vector<double> doubles{};
+    jdouble *elements = env->GetDoubleArrayElements(jDoubleArray, nullptr);
+    for (int i = 0; i < env->GetArrayLength(jDoubleArray); ++i) {
+        doubles.push_back(elements[i]);
+    }
+    env->ReleaseDoubleArrayElements(jDoubleArray, elements, 0);
+    return doubles;
+}
+
+/**
+ *
+ * @param env
+ * @param obj
+ * @param functionArray An array of three enums that represent functions.
+ * @param functionArguments A 2D array, with 3 rows,
+ *                          containing the values needed to construct each function.
+ */
+extern "C" JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setAmplitudeEnvelope(
+        JNIEnv *env,
+        jobject /* this */,
+        jintArray functionEnumArray,
+        jobjectArray functionArguments
+) {
+    jint *enumElements = env->GetIntArrayElements(functionEnumArray, nullptr);
+
+    int firstFunction = enumElements[0];
+    auto jAttackFunctionArgs = static_cast<jdoubleArray>(
+            env->GetObjectArrayElement(functionArguments, 0)
+    );
+    std::vector<double> attackFunctionArgs = convertToArray(env, jAttackFunctionArgs);
+
+    int secondFunction = enumElements[1];
+    auto jSustainFunctionArgs = static_cast<jdoubleArray>(
+            env->GetObjectArrayElement(functionArguments, 1)
+    );
+    std::vector<double> sustainFunctionArgs = convertToArray(env, jSustainFunctionArgs);
+
+    int thirdFunction = enumElements[2];
+    auto jReleaseFunctionArgs = static_cast<jdoubleArray>(
+            env->GetObjectArrayElement(functionArguments, 2)
+    );
+    std::vector<double> releaseFunctionArgs = convertToArray(env, jReleaseFunctionArgs);
+
+    env->ReleaseIntArrayElements(functionEnumArray, enumElements, 0);
 }
