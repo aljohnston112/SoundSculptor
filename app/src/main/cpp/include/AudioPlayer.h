@@ -9,9 +9,6 @@
 #include "../include/SineWaveGenerator.h"
 #include "../include/VectorGenerator.h"
 
-constexpr int kSampleRate = 44100;
-constexpr int kChannelCount = 1;
-
 /**
  * @brief AudioPlayer class that implements the oboe::AudioStreamCallback for audio playback.
  */
@@ -23,7 +20,11 @@ public:
      *
      * Configures and opens the audio stream for playback.
      */
-    AudioPlayer(std::shared_ptr<Envelope> frequency, std::shared_ptr<Envelope> amplitude);
+    AudioPlayer(
+            std::shared_ptr<SineWaveGenerator> sineWaveGenerator,
+            int channelCount,
+            int sampleRate
+    );
 
     void reset();
 
@@ -50,8 +51,7 @@ public:
     ~AudioPlayer() override;
 
 private:
-    AudioConfig audioConfig;
-    SineWaveGenerator sineWaveGenerator;
+    std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
     oboe::AudioStreamBuilder builder;
     std::shared_ptr<oboe::AudioStream> stream;
 };

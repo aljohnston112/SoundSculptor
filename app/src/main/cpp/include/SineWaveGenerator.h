@@ -31,12 +31,13 @@ public:
      * @param amplitudeEnvelope The envelope for amplitude modulation.
      */
     explicit SineWaveGenerator(
-            const AudioConfig& audioConfig,
+            int channelCount,
+            int sampleRate,
             std::shared_ptr<Envelope> frequencyEnvelope,
             std::shared_ptr<Envelope> amplitudeEnvelope
     );
 
-    /**
+/**
      * @brief Generates audio samples based on the envelopes and writes them to the output buffer.
      *
      * This method generates audio samples based on the frequency and amplitude envelopes and writes them to the
@@ -46,7 +47,7 @@ public:
      * @param numFrames The number of frames to generate.
      * @return True if either the amplitude envelope or frequency envelope if at it's end.
      */
-    bool generateSamples(float* outputBuffer, int32_t numFrames) override;
+    bool generateSamples(float *outputBuffer, int32_t numFrames) override;
 
     /**
      * @brief Resets the state of the SineWaveGenerator.
@@ -56,8 +57,13 @@ public:
      */
     void resetState() override;
 
+    void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope);
+
+    void triggerRelease();
+
 private:
-    const AudioConfig& audioConfig;    ///< The audio configuration for the generation.
+    const int channelCount;
+    const int sampleRate;
     std::shared_ptr<Envelope> frequencyEnvelope;        ///< The envelope for frequency modulation.
     std::shared_ptr<Envelope> amplitudeEnvelope;        ///< The envelope for amplitude modulation.
     double currentPhase;               ///< The current phase of the sine waveform.

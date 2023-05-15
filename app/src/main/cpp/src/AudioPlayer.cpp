@@ -1,20 +1,21 @@
+#include <utility>
+
 #include "../include/AudioPlayer.h"
 
-AudioPlayer::AudioPlayer(std::shared_ptr<Envelope> frequency, std::shared_ptr<Envelope> amplitude) :
-        audioConfig{kSampleRate, kChannelCount},
-        sineWaveGenerator(
-                audioConfig,
-                std::move(frequency),
-                std::move(amplitude)
-        ) {
+AudioPlayer::AudioPlayer(
+        std::shared_ptr<SineWaveGenerator> sineWaveGenerator,
+        int channelCount,
+        int sampleRate
+) :
+        sineWaveGenerator(std::move(sineWaveGenerator)) {
 
     // Configure the audio stream builder
     builder.setDirection(oboe::Direction::Output)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setSharingMode(oboe::SharingMode::Shared)
             ->setFormat(oboe::AudioFormat::Float)
-            ->setChannelCount(kChannelCount)
-            ->setSampleRate(kSampleRate)
+            ->setChannelCount(channelCount)
+            ->setSampleRate(sampleRate)
             ->setCallback(this);
 
     // Open and start the audio stream
@@ -25,7 +26,7 @@ AudioPlayer::AudioPlayer(std::shared_ptr<Envelope> frequency, std::shared_ptr<En
 }
 
 void AudioPlayer::reset() {
-    sineWaveGenerator.resetState();
+    sineWaveGenerator->resetState();
 }
 
 oboe::DataCallbackResult AudioPlayer::onAudioReady(
@@ -35,7 +36,7 @@ oboe::DataCallbackResult AudioPlayer::onAudioReady(
 ) {
 
     auto *outputBuffer = static_cast<float *>(audioData);
-    bool done = sineWaveGenerator.generateSamples(outputBuffer, numFrames);
+    bool done = sineWaveGenerator->generateSamples(outputBuffer, numFrames);
     return done ? oboe::DataCallbackResult::Stop : oboe::DataCallbackResult::Continue;
 }
 

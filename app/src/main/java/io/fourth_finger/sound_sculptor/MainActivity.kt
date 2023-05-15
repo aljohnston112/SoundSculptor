@@ -6,6 +6,8 @@ import io.fourth_finger.sound_sculptor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private external fun init()
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        init()
     }
 
     companion object {

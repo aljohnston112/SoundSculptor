@@ -1,57 +1,34 @@
 #include "../include/AudioPlayer.h"
 
+constexpr int kSampleRate = 44100;
+constexpr int kChannelCount = 1;
+
 std::unique_ptr<AudioPlayer> audioPlayer;
-std::unique_ptr<std::vector<std::shared_ptr<Envelope>>> envelopes;
+std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
+
+extern "C" JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
+        JNIEnv *env,
+        jobject /* this */
+) {
+    sineWaveGenerator = std::make_shared<SineWaveGenerator>(
+            kChannelCount,
+            kSampleRate,
+            nullptr,
+            nullptr
+    );
+}
 
 extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_startPlaying(
         JNIEnv *env,
         jobject /* this */
 ) {
-
-    int one_second = kSampleRate;
-    // Generate linear segments for two Envelopes
-    std::shared_ptr<std::vector<double>> envelope1Values = VectorGenerator::generateLinearSegment(
-            0.0,
-            1.0,
-            one_second
+    audioPlayer = std::make_unique<AudioPlayer>(
+            sineWaveGenerator,
+            kChannelCount,
+            kSampleRate
     );
-    std::shared_ptr<std::vector<double>> envelope2Values = VectorGenerator::generateLinearSegment(
-            1.0,
-            0.0,
-            one_second
-    );
-
-    std::shared_ptr<std::vector<double>> envelope3Values = VectorGenerator::generateLinearSegment(
-            500,
-            1000,
-            one_second
-    );
-    std::shared_ptr<std::vector<double>> envelope4Values = VectorGenerator::generateLinearSegment(
-            1000,
-            750,
-            one_second
-    );
-
-    // Create Envelope instances
-    envelopes = std::make_unique<std::vector<std::shared_ptr<Envelope>>>();
-    std::shared_ptr<Envelope> amplitude = std::make_shared<Envelope>(
-            envelope1Values,
-            std::make_shared<std::vector<double>>(),
-            envelope2Values,
-            true
-    );
-    envelopes->push_back(amplitude);
-
-    std::shared_ptr<Envelope> frequency = std::make_shared<Envelope>(
-            envelope3Values,
-            std::make_shared<std::vector<double>>(),
-            envelope4Values,
-            true
-    );
-    envelopes->push_back(frequency);
-
-    audioPlayer = std::make_unique<AudioPlayer>(frequency, amplitude);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -59,9 +36,7 @@ Java_io_fourth_1finger_sound_1sculptor_PlayTouchButton_triggerRelease(
         JNIEnv *env,
         jobject /* this */
 ) {
-    for (const std::shared_ptr<Envelope> &envelope: *envelopes) {
-        envelope->triggerRelease();
-    }
+    sineWaveGenerator->triggerRelease();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -71,7 +46,6 @@ Java_io_fourth_1finger_sound_1sculptor_TitleFragment_stopPlaying(
 ) {
     audioPlayer.get()->reset();
     audioPlayer.reset();
-    envelopes.reset();
 }
 
 std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
@@ -82,6 +56,22 @@ std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
     }
     env->ReleaseDoubleArrayElements(jDoubleArray, elements, 0);
     return doubles;
+}
+
+std::shared_ptr<std::vector<double>> generateSegment(int function, std::vector<double> args) {
+    std::shared_ptr<std::vector<double>> segment;
+    double time = args[args.size() - 1];
+    int numSamples = static_cast<int>(static_cast<double>(kSampleRate) * time);
+    switch (function) {
+        case 0:
+            segment = VectorGenerator::generateLinearSegment(
+                    args[0],
+                    args[1],
+                    numSamples
+            );
+            break;
+    }
+    return segment;
 }
 
 /**
@@ -106,18 +96,44 @@ Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setAmplitudeEnvelope(
             env->GetObjectArrayElement(functionArguments, 0)
     );
     std::vector<double> attackFunctionArgs = convertToArray(env, jAttackFunctionArgs);
+    std::shared_ptr<std::vector<double>> attack = generateSegment(
+            firstFunction,
+            attackFunctionArgs
+    );
 
     int secondFunction = enumElements[1];
     auto jSustainFunctionArgs = static_cast<jdoubleArray>(
             env->GetObjectArrayElement(functionArguments, 1)
     );
     std::vector<double> sustainFunctionArgs = convertToArray(env, jSustainFunctionArgs);
+    sustainFunctionArgs[2] = sustainFunctionArgs[1];
+    sustainFunctionArgs[1] = sustainFunctionArgs[0];
+    sustainFunctionArgs[0] = attackFunctionArgs[1];
+    std::shared_ptr<std::vector<double>> sustain = generateSegment(
+            secondFunction,
+            sustainFunctionArgs
+    );
 
     int thirdFunction = enumElements[2];
     auto jReleaseFunctionArgs = static_cast<jdoubleArray>(
             env->GetObjectArrayElement(functionArguments, 2)
     );
     std::vector<double> releaseFunctionArgs = convertToArray(env, jReleaseFunctionArgs);
+    releaseFunctionArgs[2] = releaseFunctionArgs[1];
+    releaseFunctionArgs[1] = releaseFunctionArgs[0];
+    releaseFunctionArgs[0] = sustainFunctionArgs[1];
+    std::shared_ptr<std::vector<double>> release = generateSegment(
+            thirdFunction,
+            releaseFunctionArgs
+    );
+
+    std::shared_ptr<Envelope> amplitudeEnvelope = std::make_shared<Envelope>(
+            attack,
+            sustain,
+            release,
+            true
+    );
+    sineWaveGenerator->setAmplitudeEnvelope(amplitudeEnvelope);
 
     env->ReleaseIntArrayElements(functionEnumArray, enumElements, 0);
 }
