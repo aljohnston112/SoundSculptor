@@ -1,11 +1,17 @@
-#include <utility>
-
 #include "../include/SineWaveGenerator.h"
 #include "VectorGenerator.h"
 
 static constexpr double kPI = M_PI;
 static constexpr double kTwoPi = kPI * 2;
 
+/**
+ * Constructor for the SineWaveGenerator class.
+ *
+ * @param channelCount The number of audio channels.
+ * @param sampleRate The sample rate of the audio.
+ * @param frequencyEnvelope The envelope controlling the frequency modulation.
+ * @param amplitudeEnvelope The envelope controlling the amplitude modulation.
+ */
 SineWaveGenerator::SineWaveGenerator(
         int channelCount,
         int sampleRate,
@@ -15,71 +21,28 @@ SineWaveGenerator::SineWaveGenerator(
     sampleRate(sampleRate),
     frequencyEnvelope(std::move(frequencyEnvelope)),
     amplitudeEnvelope(std::move(amplitudeEnvelope)),
-    currentPhase(0.0) {
+    currentPhase(0.0) {}
 
-    if (amplitudeEnvelope == nullptr || frequencyEnvelope == nullptr) {
-        int one_second = sampleRate;
-        // Generate linear segments for two Envelopes
-        std::shared_ptr<std::vector<double>> envelope1Values = VectorGenerator::generateLinearSegment(
-                0.0,
-                1.0,
-                one_second
-        );
-        std::shared_ptr<std::vector<double>> envelope2Values = VectorGenerator::generateLinearSegment(
-                1.0,
-                0.0,
-                one_second
-        );
-
-        std::shared_ptr<std::vector<double>> envelope3Values = VectorGenerator::generateLinearSegment(
-                500,
-                1000,
-                one_second
-        );
-        std::shared_ptr<std::vector<double>> envelope4Values = VectorGenerator::generateLinearSegment(
-                1000,
-                750,
-                one_second
-        );
-
-        // Create Envelope instances
-        if(amplitudeEnvelope == nullptr) {
-            this->amplitudeEnvelope = std::make_shared<Envelope>(
-                    envelope1Values,
-                    std::make_shared<std::vector<double>>(),
-                    envelope2Values,
-                    true
-            );
-        }
-
-        if(frequencyEnvelope == nullptr) {
-            this->frequencyEnvelope = std::make_shared<Envelope>(
-                    envelope3Values,
-                    std::make_shared<std::vector<double>>(),
-                    envelope4Values,
-                    true
-            );
-        }
-    }
-}
-
+/**
+ * Generate audio samples using the current envelope settings.
+ *
+ * @param outputBuffer The output buffer to write the audio samples to.
+ * @param numFrames The number of frames to generate.
+ * @return A boolean indicating if the generation has completed (true) or
+ *         there are more samples to generate (false).
+ */
 bool SineWaveGenerator::generateSamples(float *outputBuffer, int32_t numFrames) {
     double frequency;
     double amplitude;
     bool done = false;
-
-    if (reset) {
-        frequencyEnvelope->resetState();
-        amplitudeEnvelope->resetState();
-        currentPhase = 0.0;
-        reset = false;
-    }
 
     int i = 0;
     while (i < numFrames && !done) {
         frequency = frequencyEnvelope->nextDouble();
         amplitude = amplitudeEnvelope->nextDouble();
         done = frequencyEnvelope->finished() || amplitudeEnvelope->finished();
+
+
         // Update phase
         const double phaseIncrement =
                 kTwoPi * frequency / static_cast<double>(sampleRate);
@@ -98,14 +61,28 @@ bool SineWaveGenerator::generateSamples(float *outputBuffer, int32_t numFrames) 
     return done;
 }
 
+/**
+ * Set the amplitude envelope for the SineWaveGenerator.
+ *
+ * @param envelope The amplitude envelope to set.
+ */
 void SineWaveGenerator::setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope) {
     amplitudeEnvelope = std::move(envelope);
 }
 
+/**
+ * Reset the state of the SineWaveGenerator.
+ * This will reset the phase and envelopes.
+ */
 void SineWaveGenerator::resetState() {
-    reset = true;
+    frequencyEnvelope->resetState();
+    amplitudeEnvelope->resetState();
+    currentPhase = 0.0;
 }
 
+/**
+ * Trigger the release phase of the frequency and amplitude envelopes.
+ */
 void SineWaveGenerator::triggerRelease(){
     frequencyEnvelope->triggerRelease();
     amplitudeEnvelope->triggerRelease();

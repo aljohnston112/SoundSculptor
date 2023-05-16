@@ -24,11 +24,12 @@ class SineWaveGenerator : public AudioGenerator {
 public:
 
     /**
-     * @brief Constructs a SineWaveGenerator object.
+     * Constructor for the SineWaveGenerator class.
      *
-     * @param audioConfig The audio configuration for the generator.
-     * @param frequencyEnvelope The envelope for frequency modulation.
-     * @param amplitudeEnvelope The envelope for amplitude modulation.
+     * @param channelCount The number of audio channels.
+     * @param sampleRate The sample rate of the audio.
+     * @param frequencyEnvelope The envelope controlling the frequency modulation.
+     * @param amplitudeEnvelope The envelope controlling the amplitude modulation.
      */
     explicit SineWaveGenerator(
             int channelCount,
@@ -37,37 +38,39 @@ public:
             std::shared_ptr<Envelope> amplitudeEnvelope
     );
 
-/**
-     * @brief Generates audio samples based on the envelopes and writes them to the output buffer.
+    /**
+     * Generate audio samples using the current envelope settings.
      *
-     * This method generates audio samples based on the frequency and amplitude envelopes and writes them to the
-     * specified output buffer. It overrides the generateSamples() method from the base class.
-     *
-     * @param outputBuffer Pointer to the output buffer where the generated samples will be written.
+     * @param outputBuffer The output buffer to write the audio samples to.
      * @param numFrames The number of frames to generate.
-     * @return True if either the amplitude envelope or frequency envelope if at it's end.
+     * @return A boolean indicating if the generation is completed (true) or ongoing (false).
      */
     bool generateSamples(float *outputBuffer, int32_t numFrames) override;
 
     /**
-     * @brief Resets the state of the SineWaveGenerator.
-     *
-     * This method resets the state of the SineWaveGenerator,
-     * including the phase and the state of the frequency and amplitude envelopes.
+     * Reset the state of the SineWaveGenerator. This will reset the phase and envelopes.
      */
     void resetState() override;
 
+
+    /**
+     * Set the amplitude envelope for the SineWaveGenerator.
+     *
+     * @param envelope The amplitude envelope to set.
+     */
     void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope);
 
+    /**
+     * Trigger the release phase of the envelopes in the SineWaveGenerator.
+     */
     void triggerRelease();
 
 private:
     const int channelCount;
     const int sampleRate;
-    std::shared_ptr<Envelope> frequencyEnvelope;        ///< The envelope for frequency modulation.
-    std::shared_ptr<Envelope> amplitudeEnvelope;        ///< The envelope for amplitude modulation.
-    double currentPhase;               ///< The current phase of the sine waveform.
-    bool reset = false;                ///< Flag indicating if the generator needs to be reset.
+    std::shared_ptr<Envelope> frequencyEnvelope;
+    std::shared_ptr<Envelope> amplitudeEnvelope;
+    double currentPhase;
 };
 
 #endif // SOUNDSCULPTOR_SINEWAVEGENERATOR_H

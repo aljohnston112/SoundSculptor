@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import io.fourth_finger.sound_sculptor.Envelope.Companion.getIntForFunction
 import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
 
 class EnvelopeFragment : Fragment() {
@@ -125,13 +126,6 @@ class EnvelopeFragment : Fragment() {
             functionArgs
         )
 
-    }
-
-    private fun getIntForFunction(function: String): Int {
-        return when(function){
-            "Linear" -> 0
-            else -> 0
-        }
     }
 
     override fun onDestroyView() {
