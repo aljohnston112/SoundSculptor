@@ -1,6 +1,4 @@
-#include <utility>
-
-#include "../include/Envelope.h"
+#include "Envelope.h"
 
 Envelope::Envelope(
         std::shared_ptr<std::vector<double>> attack,

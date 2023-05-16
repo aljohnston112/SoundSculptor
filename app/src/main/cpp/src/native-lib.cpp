@@ -1,4 +1,4 @@
-#include "../include/AudioPlayer.h"
+#include "AudioPlayer.h"
 
 constexpr int kSampleRate = 44100;
 constexpr int kChannelCount = 1;
@@ -10,7 +10,7 @@ std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
     std::vector<double> doubles(env->GetArrayLength(jDoubleArray));
     jdouble *elements = env->GetDoubleArrayElements(jDoubleArray, nullptr);
     for (int i = 0; i < env->GetArrayLength(jDoubleArray); ++i) {
-        doubles.push_back(elements[i]);
+        doubles[i] = (elements[i]);
     }
     env->ReleaseDoubleArrayElements(jDoubleArray, elements, 0);
     return doubles;

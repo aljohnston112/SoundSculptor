@@ -1,4 +1,4 @@
-#include "../include/AudioPlayer.h"
+#include "AudioPlayer.h"
 
 AudioPlayer::AudioPlayer(
         std::shared_ptr<SineWaveGenerator> sineWaveGenerator,

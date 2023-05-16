@@ -1,4 +1,4 @@
-#include "../include/SineWaveGenerator.h"
+#include "SineWaveGenerator.h"
 #include "VectorGenerator.h"
 
 static constexpr double kPI = M_PI;

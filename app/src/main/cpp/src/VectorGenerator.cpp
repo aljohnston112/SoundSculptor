@@ -1,4 +1,4 @@
-#include "../include/VectorGenerator.h"
+#include "VectorGenerator.h"
 
 std::shared_ptr<std::vector<double>> VectorGenerator::generateLinearSegment(
         double start,
