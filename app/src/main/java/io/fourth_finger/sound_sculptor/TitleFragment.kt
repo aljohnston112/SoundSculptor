@@ -38,7 +38,7 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
         }
         binding.buttonAddFrequencyEnvelope.setOnClickListener {
             view.findNavController().navigate(
-                TitleFragmentDirections.actionTitleFragmentToEnvelopeFragment()
+                TitleFragmentDirections.actionTitleFragmentToEnvelopeFragment(false)
             )
         }
         binding.stopButton.setOnClickListener {

@@ -7,12 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import io.fourth_finger.sound_sculptor.Envelope.Companion.getIntForFunction
 import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
 
 class EnvelopeFragment : Fragment() {
 
+    private val args: EnvelopeFragmentArgs by navArgs()
+
     private external fun setAmplitudeEnvelope(
+        functionEnumArray: IntArray,
+        functionArguments: Array<DoubleArray>
+    )
+
+    private external fun setFrequencyEnvelope(
         functionEnumArray: IntArray,
         functionArguments: Array<DoubleArray>
     )
@@ -34,6 +43,10 @@ class EnvelopeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if(!args.IsAmplitude){
+            binding.envelopeTitle.setText(R.string.frequency_envelope)
+        }
 
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -86,25 +99,11 @@ class EnvelopeFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+            view.findNavController().popBackStack()
         }
     }
 
-    data class EnvelopeData(
-        val attackFunction: String,
-        val attackStart: Double,
-        val attackEnd: Double,
-        val attackTime: Double,
-        val sustainFunction: String,
-        val sustainEnd: Double,
-        val sustainTime: Double,
-        val releaseFunction: String,
-        val releaseEnd: Double,
-        val releaseTime: Double
-    )
-
-    // Example function to process envelope data
     private fun processEnvelopeData(envelopeData: EnvelopeData) {
-        // TODO: Process the envelope data here
         val functions = IntArray(3)
         functions[0] = getIntForFunction(envelopeData.attackFunction)
         functions[1] = getIntForFunction(envelopeData.sustainFunction)
@@ -121,10 +120,17 @@ class EnvelopeFragment : Fragment() {
         functionArgs[2][0] = envelopeData.releaseEnd
         functionArgs[2][1] = envelopeData.releaseTime
 
-        setAmplitudeEnvelope(
-            functions,
-            functionArgs
-        )
+        if(args.IsAmplitude) {
+            setAmplitudeEnvelope(
+                functions,
+                functionArgs
+            )
+        } else {
+            setFrequencyEnvelope(
+                functions,
+                functionArgs
+            )
+        }
 
     }
 

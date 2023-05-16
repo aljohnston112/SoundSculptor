@@ -61,6 +61,13 @@ public:
     void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope);
 
     /**
+     * Set the frequency envelope for the SineWaveGenerator.
+     *
+     * @param envelope The frequency envelope to set.
+     */
+    void setFrequencyEnvelope(std::shared_ptr<Envelope> envelope);
+
+    /**
      * Trigger the release phase of the envelopes in the SineWaveGenerator.
      */
     void triggerRelease();

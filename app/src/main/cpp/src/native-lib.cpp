@@ -181,3 +181,26 @@ Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setAmplitudeEnvelope(
     );
     sineWaveGenerator->setAmplitudeEnvelope(amplitudeEnvelope);
 }
+
+/**
+ *
+ * @param env
+ * @param obj
+ * @param functionArray An array of three enums that represent functions.
+ * @param functionArguments A 2D array, with 3 rows,
+ *                          containing the values needed to construct each function.
+ */
+extern "C" JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setFrequencyEnvelope(
+        JNIEnv *env,
+        jobject /* this */,
+        jintArray functionEnumArray,
+        jobjectArray functionArguments
+) {
+    std::shared_ptr<Envelope> frequencyEnvelope = make_envelope(
+            env,
+            functionEnumArray,
+            functionArguments
+    );
+    sineWaveGenerator->setFrequencyEnvelope(frequencyEnvelope);
+}

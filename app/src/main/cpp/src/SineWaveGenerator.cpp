@@ -71,6 +71,15 @@ void SineWaveGenerator::setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope)
 }
 
 /**
+ * Set the frequency envelope for the SineWaveGenerator.
+ *
+ * @param envelope The frequency envelope to set.
+ */
+void SineWaveGenerator::setFrequencyEnvelope(std::shared_ptr<Envelope> envelope) {
+    frequencyEnvelope = std::move(envelope);
+}
+
+/**
  * Reset the state of the SineWaveGenerator.
  * This will reset the phase and envelopes.
  */
@@ -87,3 +96,5 @@ void SineWaveGenerator::triggerRelease(){
     frequencyEnvelope->triggerRelease();
     amplitudeEnvelope->triggerRelease();
 }
+
+

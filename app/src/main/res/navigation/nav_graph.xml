@@ -9,7 +9,12 @@
         android:id="@+id/envelopeFragment"
         android:name="io.fourth_finger.sound_sculptor.EnvelopeFragment"
         android:label="fragment_envelope"
-        tools:layout="@layout/fragment_envelope" />
+        tools:layout="@layout/fragment_envelope" >
+        <argument
+            android:name="IsAmplitude"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
     <fragment
         android:id="@+id/titleFragment"
         android:name="io.fourth_finger.sound_sculptor.TitleFragment"

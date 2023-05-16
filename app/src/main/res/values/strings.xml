@@ -16,6 +16,7 @@
     <string name="submit">Submit</string>
     <string name="release_function">Release Function</string>
     <string name="sustain_time">Sustain Time</string>
+    <string name="frequency_envelope">Frequency Envelope</string>
 
     <string-array name="functions_array">
         <item>Linear</item>
