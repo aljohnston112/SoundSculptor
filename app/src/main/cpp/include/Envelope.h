@@ -40,6 +40,14 @@ public:
 
     bool finished() const;
 
+    double operator[](int index) const;
+
+    double getMin(){ return min; }
+
+    double getMax(){ return max; }
+
+    int getSize(){ return attack->size() + sustain->size() + release->size(); }
+
 private:
     std::shared_ptr<std::vector<double>> attack;
     std::shared_ptr<std::vector<double>> sustain;
@@ -47,6 +55,9 @@ private:
     int currentIndex = 0;
     bool loopSustain;
     bool releaseTriggered = false;
+
+    double min;
+    double max;
 };
 
 #endif // SOUNDSCULPTOR_ENVELOPE_H

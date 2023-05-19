@@ -1,3 +1,6 @@
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
+
 #include "AudioPlayer.h"
 
 constexpr int kSampleRate = 44100;
@@ -5,6 +8,8 @@ constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
+
+std::unique_ptr<std::vector<std::vector<std::shared_ptr<Envelope>>>> envelopes;
 
 std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
     std::vector<double> doubles(env->GetArrayLength(jDoubleArray));
@@ -122,6 +127,9 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
             functionArgumentsAmplitude
     );
 
+    (*envelopes)[0][0] = amplitudeEnvelope;
+    (*envelopes)[1][0] = frequencyEnvelope;
+
     sineWaveGenerator = std::make_shared<SineWaveGenerator>(
             kChannelCount,
             kSampleRate,
@@ -203,4 +211,75 @@ Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setFrequencyEnvelope(
             functionArguments
     );
     sineWaveGenerator->setFrequencyEnvelope(frequencyEnvelope);
+}
+
+extern "C" JNIEXPORT double JNICALL
+Java_io_fourth_1finger_sound_1sculptor_FunctionView_getXToYRatio(
+        JNIEnv *env,
+        jobject clazz,
+        int row,
+        int col
+){
+    double min = (*envelopes)[row][col]->getMin();
+    double max = (*envelopes)[row][col]->getMax();
+    double size = (*envelopes)[row][col]->getSize();
+    return (size / kSampleRate) / (max - min);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_FunctionView_nativeDraw(
+        JNIEnv *env,
+        jobject clazz,
+        jobject canvas,
+        int row,
+        int col
+) {
+    ANativeWindow* window = ANativeWindow_fromSurface(env, canvas);
+    if (window != nullptr) {
+        ANativeWindow_acquire(window);
+
+        int32_t width = ANativeWindow_getWidth(window);
+        int32_t height = ANativeWindow_getHeight(window);
+
+        ANativeWindow_Buffer buffer;
+        if (ANativeWindow_lock(window, &buffer, nullptr) < 0) {
+            // Blue
+            uint32_t lineColor = 0xFF006699;
+
+            std::shared_ptr<Envelope> envelope = (*envelopes)[row][col];
+            double minY = envelope->getMin();
+            double maxY = envelope->getMax();
+            double yScale = height / (maxY - minY);
+
+            // Add room around constant
+            if (minY == maxY) {
+                minY += 1.0;
+                maxY += 1.0;
+            }
+
+            // Draw
+            int increment = envelope->getSize() / width;
+            for (int x = 0; x <= width; ++x) {
+                int y =  static_cast<int>((*envelope)[x * increment] * yScale);
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    uint32_t* pixelPtr =
+                            reinterpret_cast<uint32_t*>(buffer.bits) + y * buffer.stride + x;
+                    *pixelPtr = lineColor;
+                }
+            }
+
+            // Unlock the window's canvas
+            ANativeWindow_unlockAndPost(window);
+
+            // Release the window's canvas
+            ANativeWindow_release(window);
+        } else {
+            // TODO error
+            ANativeWindow_release(window);
+        }
+
+    } else {
+        // TODO error
+    }
+
 }

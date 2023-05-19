@@ -26,6 +26,13 @@ public:
             double end,
             int numSamples
     );
+
+    static std::shared_ptr<std::vector<double>>
+    generateQuadraticSegment(double start, double vertex, double end, int numSamplesToVertex,
+                             int numSamples);
+
+    static std::shared_ptr<std::vector<double>>
+    generateConstantSegment(double constant, double numSamples);
 };
 
 #endif //SOUNDSCULPTOR_VECTORGENERATOR_H

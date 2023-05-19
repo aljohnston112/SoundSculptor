@@ -24,4 +24,9 @@
             android:id="@+id/action_titleFragment_to_envelopeFragment"
             app:destination="@id/envelopeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="io.fourth_finger.sound_sculptor.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" />
 </navigation>

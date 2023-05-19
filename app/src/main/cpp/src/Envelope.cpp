@@ -10,7 +10,26 @@ Envelope::Envelope(
           sustain(std::move(sustain)),
           release(std::move(release)),
           loopSustain(loopSustain),
-          currentIndex(0) {}
+          currentIndex(0) {
+    auto min_max = std::minmax(
+            std::begin(*this->attack),
+            std::end(*this->attack)
+    );
+    min = *min_max.first;
+    max = *min_max.second;
+    auto sustain_min_max = std::minmax(
+            std::begin(*this->sustain),
+            std::end(*this->sustain)
+    );
+    min = std::max(min, *sustain_min_max.first);
+    max = std::max(max, *sustain_min_max.second);
+    auto release_min_max = std::minmax(
+            std::begin(*this->release),
+            std::end(*this->release)
+    );
+    min = std::max(min, *release_min_max.first);
+    max = std::max(max, *release_min_max.second);
+}
 
 
 double Envelope::nextDouble() {
@@ -36,7 +55,7 @@ double Envelope::nextDouble() {
         value = (*release)[releaseIndex];
     }
     currentIndex++;
-    if (currentIndex >= attack->size() + sustain->size() && loopSustain && !releaseTriggered){
+    if (currentIndex >= attack->size() + sustain->size() && loopSustain && !releaseTriggered) {
         currentIndex = static_cast<int>(attack->size());
     } else if (currentIndex >= attack->size() + sustain->size() + release->size()) {
         currentIndex = 0;
@@ -58,3 +77,14 @@ bool Envelope::finished() const {
     return releaseTriggered && currentIndex == 0;
 }
 
+double Envelope::operator[](int index) const {
+    if (index < attack->size()) {
+        return (*attack)[index];
+    } else if (index < attack->size() + sustain->size()) {
+        return (*sustain)[index - attack->size()];
+    } else if (index < attack->size() + sustain->size() + release->size()) {
+        return (*release)[index - attack->size() - sustain->size()];
+    } else {
+        throw std::out_of_range("Index out of range.");
+    }
+}
