@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_titleFragment_to_envelopeFragment"
             app:destination="@id/envelopeFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"

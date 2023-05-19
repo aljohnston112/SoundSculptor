@@ -8,7 +8,6 @@ constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
-
 std::unique_ptr<std::vector<std::vector<std::shared_ptr<Envelope>>>> envelopes;
 
 std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
@@ -127,8 +126,16 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
             functionArgumentsAmplitude
     );
 
-    (*envelopes)[0][0] = amplitudeEnvelope;
-    (*envelopes)[1][0] = frequencyEnvelope;
+    envelopes = std::make_unique<std::vector<std::vector<std::shared_ptr<Envelope>>>>();
+
+    // Amplitude envelopes
+    (*envelopes).emplace_back(std::vector<std::shared_ptr<Envelope>>());
+
+    // Frequency envelopes
+    (*envelopes).emplace_back(std::vector<std::shared_ptr<Envelope>>());
+
+    (*envelopes)[0].push_back(amplitudeEnvelope);
+    (*envelopes)[1].push_back(frequencyEnvelope);
 
     sineWaveGenerator = std::make_shared<SineWaveGenerator>(
             kChannelCount,
@@ -263,23 +270,31 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_nativeDraw(
                 int y =  static_cast<int>((*envelope)[x * increment] * yScale);
                 if (x >= 0 && x < width && y >= 0 && y < height) {
                     uint32_t* pixelPtr =
-                            reinterpret_cast<uint32_t*>(buffer.bits) + y * buffer.stride + x;
+                            reinterpret_cast<uint32_t*>(buffer.bits) +
+                                    (y * buffer.stride) + x;
                     *pixelPtr = lineColor;
                 }
             }
 
-            // Unlock the window's canvas
             ANativeWindow_unlockAndPost(window);
-
-            // Release the window's canvas
-            ANativeWindow_release(window);
         } else {
             // TODO error
-            ANativeWindow_release(window);
         }
-
+        ANativeWindow_release(window);
     } else {
         // TODO error
     }
 
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_io_fourth_1finger_sound_1sculptor_MainRecyclerViewAdapter_getNumEnvelopes(
+        JNIEnv *env,
+        jobject clazz
+){
+    int size = 0;
+    for(auto &i : *envelopes){
+        size += static_cast<int>(i.size());
+    }
+    return size;
 }

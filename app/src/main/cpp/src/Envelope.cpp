@@ -15,20 +15,32 @@ Envelope::Envelope(
             std::begin(*this->attack),
             std::end(*this->attack)
     );
-    min = *min_max.first;
-    max = *min_max.second;
+    if(min_max.first != std::end(*this->attack)) {
+        min = *min_max.first;
+    }
+    if(min_max.second != std::end(*this->attack)) {
+        max = *min_max.second;
+    }
     auto sustain_min_max = std::minmax(
             std::begin(*this->sustain),
             std::end(*this->sustain)
     );
-    min = std::max(min, *sustain_min_max.first);
-    max = std::max(max, *sustain_min_max.second);
+    if(sustain_min_max.first != std::end(*this->sustain)) {
+        min = std::max(min, *sustain_min_max.first);
+    }
+    if(sustain_min_max.second != std::end(*this->sustain)) {
+        max = std::max(max, *sustain_min_max.second);
+    }
     auto release_min_max = std::minmax(
             std::begin(*this->release),
             std::end(*this->release)
     );
-    min = std::max(min, *release_min_max.first);
-    max = std::max(max, *release_min_max.second);
+    if(release_min_max.first != std::end(*this->release)) {
+        min = std::max(min, *release_min_max.first);
+    }
+    if(release_min_max.second != std::end(*this->release)) {
+        max = std::max(max, *release_min_max.second);
+    }
 }
 
 

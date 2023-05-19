@@ -2,6 +2,10 @@ package io.fourth_finger.sound_sculptor
 
 import android.content.Context
 import android.graphics.Canvas
+import android.util.AttributeSet
+import android.view.Surface
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
@@ -11,7 +15,10 @@ import kotlin.properties.Delegates
  * A Surface view that draws graphs that correspond to the envelopes on the NDK side.
  * setPosition must be called before this view is drawn.
  */
-class FunctionView(context: Context): View(context) {
+class FunctionView(
+    context: Context,
+    attributeSet: AttributeSet
+): SurfaceView(context, attributeSet) {
 
     private var row: Int by Delegates.notNull()
     private var col: Int by Delegates.notNull()
@@ -22,7 +29,7 @@ class FunctionView(context: Context): View(context) {
     ) : Double
 
     private external fun nativeDraw(
-        canvas: Canvas,
+        surface: Surface,
         row: Int,
         col: Int
     )
@@ -36,9 +43,20 @@ class FunctionView(context: Context): View(context) {
         this.col = col
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        nativeDraw(canvas, row, col)
+    fun draw() {
+        holder.addCallback( object :  SurfaceHolder.Callback {
+            override fun surfaceCreated(p0: SurfaceHolder) {
+                nativeDraw(holder.surface, row, col)
+            }
+
+            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+                nativeDraw(holder.surface, row, col)
+            }
+
+            override fun surfaceDestroyed(p0: SurfaceHolder) {
+
+            }
+        })
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

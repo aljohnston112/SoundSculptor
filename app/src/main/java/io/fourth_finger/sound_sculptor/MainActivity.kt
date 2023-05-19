@@ -1,6 +1,7 @@
 package io.fourth_finger.sound_sculptor
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import io.fourth_finger.sound_sculptor.databinding.ActivityMainBinding
 import io.fourth_finger.sound_sculptor.Envelope.Companion.getIntForFunction
@@ -22,6 +23,12 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        )
+
         val linearFunctionEnum = getIntForFunction("Linear")
         val functionEnums = IntArray(3) { linearFunctionEnum }
         val functionArgsFrequency = arrayOf(
@@ -35,6 +42,7 @@ class MainActivity : AppCompatActivity() {
             doubleArrayOf(0.0, 1.0, 0.0),
             )
         init(functionEnums, functionArgsFrequency, functionEnums, functionArgsAmplitude)
+
     }
 
     companion object {

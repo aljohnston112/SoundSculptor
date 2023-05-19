@@ -16,7 +16,6 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
 
     private val binding get() = _binding!!
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -43,6 +42,12 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
         }
         binding.stopButton.setOnClickListener {
             stopPlaying()
+        }
+
+        binding.buttonMain.setOnClickListener{
+            view.findNavController().navigate(
+                TitleFragmentDirections.actionTitleFragmentToMainFragment()
+            )
         }
     }
 

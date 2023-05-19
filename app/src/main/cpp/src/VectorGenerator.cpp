@@ -4,7 +4,7 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateConstantSegment(
         double constant,
         double numSamples
 ) {
-    if (numSamples < 1) {
+    if (numSamples < 0) {
         throw std::invalid_argument("Invalid argument: numSamples must be non-negative");
     }
 
@@ -29,7 +29,7 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateLinearSegment(
         double end,
         int numSamples
 ) {
-    if (numSamples < 1) {
+    if (numSamples < 0) {
         throw std::invalid_argument("Invalid argument: numSamples must be non-negative");
     }
 
@@ -63,11 +63,12 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateQuadraticSegment(
         int numSamplesToVertex,
         int numSamples
 ) {
-    if (numSamplesToVertex < 1) {
+    // TODO if both numSamplesToVertex and numSamples == 0
+    if (numSamplesToVertex < 0) {
         throw std::invalid_argument(
                 "Invalid argument: numSamplesToVertex must be non-negative"
         );
-    } else if (numSamples < 1) {
+    } else if (numSamples < 0) {
         throw std::invalid_argument(
                 "Invalid argument: numSamples must be non-negative"
         );

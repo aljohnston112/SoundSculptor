@@ -43,6 +43,7 @@ find_library( # Sets the name of the path variable.
 
         # Specifies the name of the NDK library that
         # you want CMake to locate.
+        android
         log)
 
 find_package(
@@ -57,4 +58,5 @@ target_link_libraries( # Specifies the target library.
         oboe::oboe
         # Links the target library to the log library
         # included in the NDK.
+        android
         ${log-lib})

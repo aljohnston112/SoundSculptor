@@ -1,11 +1,13 @@
 package io.fourth_finger.sound_sculptor
 
+import android.graphics.Rect
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import io.fourth_finger.sound_sculptor.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
@@ -25,6 +27,33 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val numRows = 2
+        val layoutManager = StaggeredGridLayoutManager(
+            numRows,
+            StaggeredGridLayoutManager.HORIZONTAL
+        )
+        binding.mainRecyclerView.layoutManager = layoutManager
 
+        binding.mainRecyclerView.adapter = MainRecyclerViewAdapter()
+
+        binding.mainRecyclerView.addItemDecoration(
+            object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                // TODO allow for the last item in one row to take up the whole row
+                //  if the other row is wider due to more elements
+                val layoutParams = view.layoutParams as
+                        StaggeredGridLayoutManager.LayoutParams
+                val rightPadding = 0
+                outRect.set(0, 0, rightPadding, 0)
+            }
+        })
+    }
 
 }
