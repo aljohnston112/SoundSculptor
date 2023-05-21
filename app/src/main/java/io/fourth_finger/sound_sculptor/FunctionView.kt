@@ -1,12 +1,17 @@
 package io.fourth_finger.sound_sculptor
 
+import android.R.attr
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.view.View
+import java.nio.Buffer
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
@@ -18,46 +23,154 @@ import kotlin.properties.Delegates
 class FunctionView(
     context: Context,
     attributeSet: AttributeSet
-): SurfaceView(context, attributeSet) {
+) : View(context, attributeSet) {
 
     private var row: Int by Delegates.notNull()
     private var col: Int by Delegates.notNull()
 
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    private val borderStrokeWidth = 4;
+
+    init {
+        linePaint.color = context.getColor(R.color.purple_200)
+        linePaint.strokeWidth = 8f
+
+        val borderStrokeWidth = 4
+        borderPaint.strokeWidth = borderStrokeWidth.toFloat()
+        borderPaint.color = Color.BLACK
+
+
+        textPaint.textSize = 64f
+        textPaint.color = Color.BLACK
+    }
+
     private external fun getXToYRatio(
         row: Int,
         col: Int
-    ) : Double
+    ): Double
 
-    private external fun nativeDraw(
-        surface: Surface,
+    private external fun getGraph(
+        byteBuffer: Buffer,
         row: Int,
-        col: Int
-    )
+        col: Int,
+        width: Int,
+        height: Int
+    ): FloatArray
 
     private val xToYRatio: Double
-        get() { return getXToYRatio(row, col) }
+        get() {
+            return getXToYRatio(row, col)
+        }
 
     // TODO this is a bad solution
-    fun setPosition(row: Int, col: Int){
+    fun setPosition(row: Int, col: Int) {
         this.row = row
         this.col = col
     }
 
-    fun draw() {
-        holder.addCallback( object :  SurfaceHolder.Callback {
-            override fun surfaceCreated(p0: SurfaceHolder) {
-                nativeDraw(holder.surface, row, col)
-            }
-
-            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-                nativeDraw(holder.surface, row, col)
-            }
-
-            override fun surfaceDestroyed(p0: SurfaceHolder) {
-
-            }
-        })
+    override fun onDraw(canvas: Canvas) {
+        val directFloatBuffer = ByteBuffer.allocateDirect(
+            width * 4
+        ).order(ByteOrder.nativeOrder()).asFloatBuffer()
+        val minMax = getGraph(directFloatBuffer, row, col, width, height)
+        val minY = minMax[0]
+        val maxY = minMax[1]
+        val yScale: Float = height / (maxY - minY)
+        var lastValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
+        for (i in 1 until directFloatBuffer.capacity()) {
+            val currentValue = abs((directFloatBuffer[i] - minY) - (maxY - minY)) * yScale
+            canvas.drawLine(
+                i.toFloat(),
+                lastValue,
+                (i + 1).toFloat(),
+                currentValue,
+                linePaint
+            )
+            lastValue = currentValue
+        }
+        drawYValues(
+            canvas,
+            directFloatBuffer[0],
+            directFloatBuffer[directFloatBuffer.capacity() - 1]
+        )
+        drawBorder(canvas)
     }
+
+    private fun drawYValues(canvas: Canvas, startValue: Float, endValue: Float) {
+        // Draw the y values for the end points
+        val startText: String = String.format("(%.2f)", startValue)
+        val endText: String = String.format("(%.2f)", endValue)
+
+        var textWidthStart = textPaint.measureText(startText)
+        var textWidthEnd = textPaint.measureText(endText)
+        // The text should only take up to half the view width
+        while ((textWidthStart + textWidthEnd + borderStrokeWidth) * 2.0 > width) {
+            textPaint.textSize = textPaint.textSize - 1
+            textWidthStart = textPaint.measureText(startText)
+            textWidthEnd = textPaint.measureText(endText)
+        }
+        canvas.drawText(
+            startText,
+            (borderStrokeWidth / 2.0).roundToInt().toFloat(),
+            (height / 2.0).roundToInt().toFloat(),
+            textPaint
+        )
+        canvas.drawText(
+            endText,
+            (width - textWidthEnd - borderStrokeWidth / 2.0).roundToInt().toFloat(),
+            (height / 2.0).roundToInt().toFloat(),
+            textPaint
+        )
+    }
+
+    private fun drawBorder(canvas: Canvas) {
+//        if (isThisSelected) {
+//            borderStrokeWidth *= 4
+//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
+//        }
+
+        //Right
+        canvas.drawLine(
+            width.toFloat(),
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            borderPaint
+        )
+        //Left
+        canvas.drawLine(0f, height.toFloat(), 0f, 0f, borderPaint)
+
+        // TODO why?
+        // Bottom
+//        if (isAmplitude) {
+//            borderColor.strokeWidth = (borderStrokeWidth / 2.0).toFloat()
+//        }
+        canvas.drawLine(
+            width.toFloat(),
+            height.toFloat(),
+            0f,
+            height.toFloat(),
+            borderPaint
+        )
+
+        // TODO why?
+        //Top
+//        if (!isAmplitude) {
+//            borderColor.strokeWidth = (borderStrokeWidth / 2.0).toFloat()
+//        } else {
+//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
+//        }
+
+        canvas.drawLine(0f, 0f, width.toFloat(), 0f, borderPaint)
+//        if (isThisSelected) {
+//            borderStrokeWidth /= 4
+//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
+//        }
+    }
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Want to match height
@@ -65,7 +178,9 @@ class FunctionView(
         val desiredWidth = (measuredHeight * xToYRatio).roundToInt()
 
         // Sacrifice width if needed
-        val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec)) {
+        val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&
+            MeasureSpec.getSize(widthMeasureSpec) != 0
+        ) {
             resolveSizeAndState(
                 desiredWidth,
                 widthMeasureSpec,
@@ -77,5 +192,6 @@ class FunctionView(
 
         setMeasuredDimension(width, measuredHeight)
     }
+
 
 }

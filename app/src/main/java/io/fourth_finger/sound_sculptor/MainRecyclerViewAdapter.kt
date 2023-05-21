@@ -32,7 +32,7 @@ class MainRecyclerViewAdapter:
         val row = position % numRows
         val col = position.floorDiv(numRows)
         holder.functionView.setPosition(row, col)
-        holder.functionView.draw()
+        holder.functionView.invalidate()
     }
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {

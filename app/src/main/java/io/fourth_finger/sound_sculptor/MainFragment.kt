@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
 import io.fourth_finger.sound_sculptor.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
@@ -34,6 +35,8 @@ class MainFragment : Fragment() {
             numRows,
             StaggeredGridLayoutManager.HORIZONTAL
         )
+        layoutManager.gapStrategy = GAP_HANDLING_NONE
+        layoutManager.spanCount = 2
         binding.mainRecyclerView.layoutManager = layoutManager
 
         binding.mainRecyclerView.adapter = MainRecyclerViewAdapter()

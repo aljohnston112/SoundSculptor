@@ -11,7 +11,7 @@ Envelope::Envelope(
           release(std::move(release)),
           loopSustain(loopSustain),
           currentIndex(0) {
-    auto min_max = std::minmax(
+    auto min_max = std::minmax_element(
             std::begin(*this->attack),
             std::end(*this->attack)
     );
@@ -21,22 +21,22 @@ Envelope::Envelope(
     if(min_max.second != std::end(*this->attack)) {
         max = *min_max.second;
     }
-    auto sustain_min_max = std::minmax(
+    auto sustain_min_max = std::minmax_element(
             std::begin(*this->sustain),
             std::end(*this->sustain)
     );
     if(sustain_min_max.first != std::end(*this->sustain)) {
-        min = std::max(min, *sustain_min_max.first);
+        min = std::min(min, *sustain_min_max.first);
     }
     if(sustain_min_max.second != std::end(*this->sustain)) {
         max = std::max(max, *sustain_min_max.second);
     }
-    auto release_min_max = std::minmax(
+    auto release_min_max = std::minmax_element(
             std::begin(*this->release),
             std::end(*this->release)
     );
     if(release_min_max.first != std::end(*this->release)) {
-        min = std::max(min, *release_min_max.first);
+        min = std::min(min, *release_min_max.first);
     }
     if(release_min_max.second != std::end(*this->release)) {
         max = std::max(max, *release_min_max.second);

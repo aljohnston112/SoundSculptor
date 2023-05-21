@@ -33,13 +33,13 @@ class MainActivity : AppCompatActivity() {
         val functionEnums = IntArray(3) { linearFunctionEnum }
         val functionArgsFrequency = arrayOf(
             doubleArrayOf(200.0, 400.0, 1.0),
-            doubleArrayOf(400.0, 0.0, 0.0),
-            doubleArrayOf(20.0, 1.0, 0.0),
+            doubleArrayOf(400.0, 400.0, 0.0),
+            doubleArrayOf(20.0, 1.0),
         )
         val functionArgsAmplitude = arrayOf(
             doubleArrayOf(0.0, 1.0, 1.0),
-            doubleArrayOf(1.0, 0.0, 0.0),
-            doubleArrayOf(0.0, 1.0, 0.0),
+            doubleArrayOf(1.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 1.0),
             )
         init(functionEnums, functionArgsFrequency, functionEnums, functionArgsAmplitude)
 

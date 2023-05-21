@@ -10,25 +10,25 @@ std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
 std::unique_ptr<std::vector<std::vector<std::shared_ptr<Envelope>>>> envelopes;
 
-std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArray) {
-    std::vector<double> doubles(env->GetArrayLength(jDoubleArray));
-    jdouble *elements = env->GetDoubleArrayElements(jDoubleArray, nullptr);
-    for (int i = 0; i < env->GetArrayLength(jDoubleArray); ++i) {
+std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArrayArgs) {
+    std::vector<double> doubles(env->GetArrayLength(jDoubleArrayArgs));
+    jdouble *elements = env->GetDoubleArrayElements(jDoubleArrayArgs, nullptr);
+    for (int i = 0; i < env->GetArrayLength(jDoubleArrayArgs); ++i) {
         doubles[i] = (elements[i]);
     }
-    env->ReleaseDoubleArrayElements(jDoubleArray, elements, 0);
+    env->ReleaseDoubleArrayElements(jDoubleArrayArgs, elements, 0);
     return doubles;
 }
 
 std::shared_ptr<std::vector<double>> generateSegment(int function, std::vector<double> args) {
     std::shared_ptr<std::vector<double>> segment;
-    double time = args[args.size() - 1];
-    int numSamples = static_cast<int>(static_cast<double>(kSampleRate) * time);
+    double time = args.at(2);
+    int numSamples = static_cast<int>(std::round(static_cast<double>(kSampleRate) * time));
     switch (function) {
         case 0:
             segment = VectorGenerator::generateLinearSegment(
-                    args[0],
-                    args[1],
+                    args.at(0),
+                    args.at(1),
                     numSamples
             );
             break;
@@ -73,9 +73,6 @@ std::shared_ptr<Envelope> make_envelope(
             env,
             jSustainFunctionArgs
     );
-    sustainFunctionArgs[2] = sustainFunctionArgs[1];
-    sustainFunctionArgs[1] = sustainFunctionArgs[0];
-    sustainFunctionArgs[0] = attackFunctionArgs[1];
     std::shared_ptr<std::vector<double>> sustain = generateSegment(
             secondFunction,
             sustainFunctionArgs
@@ -89,7 +86,7 @@ std::shared_ptr<Envelope> make_envelope(
             env,
             jReleaseFunctionArgs
     );
-    releaseFunctionArgs[2] = releaseFunctionArgs[1];
+    releaseFunctionArgs.push_back(releaseFunctionArgs[1]);
     releaseFunctionArgs[1] = releaseFunctionArgs[0];
     releaseFunctionArgs[0] = sustainFunctionArgs[1];
     std::shared_ptr<std::vector<double>> release = generateSegment(
@@ -226,74 +223,58 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_getXToYRatio(
         jobject clazz,
         int row,
         int col
-){
-    double min = (*envelopes)[row][col]->getMin();
-    double max = (*envelopes)[row][col]->getMax();
+) {
     double size = (*envelopes)[row][col]->getSize();
-    return (size / kSampleRate) / (max - min);
+    return (size / kSampleRate);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_FunctionView_nativeDraw(
+extern "C" JNIEXPORT jfloatArray JNICALL
+Java_io_fourth_1finger_sound_1sculptor_FunctionView_getGraph(
         JNIEnv *env,
         jobject clazz,
-        jobject canvas,
+        jobject buffer,
         int row,
-        int col
+        int col,
+        int width,
+        int height
 ) {
-    ANativeWindow* window = ANativeWindow_fromSurface(env, canvas);
-    if (window != nullptr) {
-        ANativeWindow_acquire(window);
+    std::shared_ptr<Envelope> envelope = (*envelopes)[row][col];
+    auto minY = static_cast<float>(envelope->getMin());
+    auto maxY = static_cast<float>(envelope->getMax());
 
-        int32_t width = ANativeWindow_getWidth(window);
-        int32_t height = ANativeWindow_getHeight(window);
-
-        ANativeWindow_Buffer buffer;
-        if (ANativeWindow_lock(window, &buffer, nullptr) < 0) {
-            // Blue
-            uint32_t lineColor = 0xFF006699;
-
-            std::shared_ptr<Envelope> envelope = (*envelopes)[row][col];
-            double minY = envelope->getMin();
-            double maxY = envelope->getMax();
-            double yScale = height / (maxY - minY);
-
-            // Add room around constant
-            if (minY == maxY) {
-                minY += 1.0;
-                maxY += 1.0;
-            }
-
-            // Draw
-            int increment = envelope->getSize() / width;
-            for (int x = 0; x <= width; ++x) {
-                int y =  static_cast<int>((*envelope)[x * increment] * yScale);
-                if (x >= 0 && x < width && y >= 0 && y < height) {
-                    uint32_t* pixelPtr =
-                            reinterpret_cast<uint32_t*>(buffer.bits) +
-                                    (y * buffer.stride) + x;
-                    *pixelPtr = lineColor;
-                }
-            }
-
-            ANativeWindow_unlockAndPost(window);
-        } else {
-            // TODO error
-        }
-        ANativeWindow_release(window);
-    } else {
-        // TODO error
+    // Add room around constant
+    if (minY == maxY) {
+        minY += 1.0;
+        maxY += 1.0;
     }
 
+    static_assert(
+            std::numeric_limits<float>::is_iec559 == true && sizeof(float) == 4,
+            "IEEE754 needed to compile"
+    );
+    auto *bufferPtr = static_cast<char *>(env->GetDirectBufferAddress(buffer));
+    if (bufferPtr != nullptr) {
+        int increment = envelope->getSize() / width;
+        for (int x = 0; x <= width; ++x) {
+            auto y = static_cast<float>((*envelope)[x * increment]);
+            std::memcpy(bufferPtr + (x * 4), &y, 4);
+        }
+        auto y = static_cast<float>((*envelope)[(*envelope).getSize() - 1]);
+        std::memcpy(bufferPtr + ((width - 1) * 4), &y, 4);
+    }
+    jfloatArray min_max = env->NewFloatArray(2);
+    jfloat mm[2]{minY, maxY};
+    env->SetFloatArrayRegion(min_max, 0, 2, mm);
+    return min_max;
 }
 
 extern "C" JNIEXPORT jint JNICALL
 Java_io_fourth_1finger_sound_1sculptor_MainRecyclerViewAdapter_getNumEnvelopes(
         JNIEnv *env,
         jobject clazz
-){
+) {
     int size = 0;
-    for(auto &i : *envelopes){
+    for (auto &i: *envelopes) {
         size += static_cast<int>(i.size());
     }
     return size;
