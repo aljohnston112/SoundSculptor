@@ -8,7 +8,7 @@ constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
-std::unique_ptr<std::vector<std::vector<std::shared_ptr<Envelope>>>> envelopes;
+std::vector<std::vector<std::shared_ptr<Envelope>>> envelopes;
 
 std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArrayArgs) {
     std::vector<double> doubles(env->GetArrayLength(jDoubleArrayArgs));
@@ -123,16 +123,16 @@ Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
             functionArgumentsAmplitude
     );
 
-    envelopes = std::make_unique<std::vector<std::vector<std::shared_ptr<Envelope>>>>();
+    envelopes = std::vector<std::vector<std::shared_ptr<Envelope>>>();
 
     // Amplitude envelopes
-    (*envelopes).emplace_back(std::vector<std::shared_ptr<Envelope>>());
+    envelopes.emplace_back(std::vector<std::shared_ptr<Envelope>>());
 
     // Frequency envelopes
-    (*envelopes).emplace_back(std::vector<std::shared_ptr<Envelope>>());
+    envelopes.emplace_back(std::vector<std::shared_ptr<Envelope>>());
 
-    (*envelopes)[0].push_back(amplitudeEnvelope);
-    (*envelopes)[1].push_back(frequencyEnvelope);
+    envelopes[0].push_back(amplitudeEnvelope);
+    envelopes[1].push_back(frequencyEnvelope);
 
     sineWaveGenerator = std::make_shared<SineWaveGenerator>(
             kChannelCount,
@@ -224,7 +224,7 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_getXToYRatio(
         int row,
         int col
 ) {
-    double size = (*envelopes)[row][col]->getSize();
+    double size = envelopes[row][col]->getSize();
     return (size / kSampleRate);
 }
 
@@ -238,7 +238,7 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_getGraph(
         int width,
         int height
 ) {
-    std::shared_ptr<Envelope> envelope = (*envelopes)[row][col];
+    std::shared_ptr<Envelope> envelope = envelopes[row][col];
     auto minY = static_cast<float>(envelope->getMin());
     auto maxY = static_cast<float>(envelope->getMax());
 
@@ -274,8 +274,18 @@ Java_io_fourth_1finger_sound_1sculptor_MainRecyclerViewAdapter_getNumEnvelopes(
         jobject clazz
 ) {
     int size = 0;
-    for (auto &i: *envelopes) {
+    for (const auto& i: envelopes) {
         size += static_cast<int>(i.size());
     }
     return size;
+}
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_io_fourth_1finger_sound_1sculptor_FunctionView_isValidPosition(
+        JNIEnv *env,
+        jobject thiz,
+        jint row,
+        jint col
+) {
+    return row < envelopes.size() && col < envelopes.at(row).size();
 }

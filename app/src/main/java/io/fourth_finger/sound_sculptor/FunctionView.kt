@@ -1,6 +1,5 @@
 package io.fourth_finger.sound_sculptor
 
-import android.R.attr
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -11,7 +10,6 @@ import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
@@ -32,7 +30,7 @@ class FunctionView(
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private val borderStrokeWidth = 4;
+    private val borderStrokeWidth = 8;
 
     init {
         linePaint.color = context.getColor(R.color.purple_200)
@@ -60,6 +58,11 @@ class FunctionView(
         height: Int
     ): FloatArray
 
+    private external fun isValidPosition(
+        row: Int,
+        col: Int
+    ): Boolean
+
     private val xToYRatio: Double
         get() {
             return getXToYRatio(row, col)
@@ -72,30 +75,34 @@ class FunctionView(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val directFloatBuffer = ByteBuffer.allocateDirect(
-            width * 4
-        ).order(ByteOrder.nativeOrder()).asFloatBuffer()
-        val minMax = getGraph(directFloatBuffer, row, col, width, height)
-        val minY = minMax[0]
-        val maxY = minMax[1]
-        val yScale: Float = height / (maxY - minY)
-        var lastValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
-        for (i in 1 until directFloatBuffer.capacity()) {
-            val currentValue = abs((directFloatBuffer[i] - minY) - (maxY - minY)) * yScale
-            canvas.drawLine(
-                i.toFloat(),
-                lastValue,
-                (i + 1).toFloat(),
-                currentValue,
-                linePaint
+        if(hasValidPosition()) {
+            val directFloatBuffer = ByteBuffer.allocateDirect(
+                width * 4
+            ).order(ByteOrder.nativeOrder()).asFloatBuffer()
+            val minMax = getGraph(directFloatBuffer, row, col, width, height)
+            val minY = minMax[0]
+            val maxY = minMax[1]
+            val yScale: Float = height / (maxY - minY)
+            var lastValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
+            for (i in 1 until directFloatBuffer.capacity()) {
+                val currentValue = abs((directFloatBuffer[i] - minY) - (maxY - minY)) * yScale
+                canvas.drawLine(
+                    i.toFloat(),
+                    lastValue,
+                    (i + 1).toFloat(),
+                    currentValue,
+                    linePaint
+                )
+                lastValue = currentValue
+            }
+            drawYValues(
+                canvas,
+                directFloatBuffer[0],
+                directFloatBuffer[directFloatBuffer.capacity() - 1]
             )
-            lastValue = currentValue
+        } else {
+            drawPlus(canvas)
         }
-        drawYValues(
-            canvas,
-            directFloatBuffer[0],
-            directFloatBuffer[directFloatBuffer.capacity() - 1]
-        )
         drawBorder(canvas)
     }
 
@@ -171,27 +178,50 @@ class FunctionView(
 //        }
     }
 
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Want to match height
-        val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)
-        val desiredWidth = (measuredHeight * xToYRatio).roundToInt()
-
-        // Sacrifice width if needed
-        val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&
-            MeasureSpec.getSize(widthMeasureSpec) != 0
-        ) {
-            resolveSizeAndState(
-                desiredWidth,
-                widthMeasureSpec,
-                measuredState
-            ) or MEASURED_SIZE_MASK
-        } else {
-            desiredWidth
-        }
-
-        setMeasuredDimension(width, measuredHeight)
+    private fun hasValidPosition(): Boolean {
+        return isValidPosition(row, col)
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        // Want to keep height
+        val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)
+
+        if(hasValidPosition()) {
+            // Sacrifice width if needed
+            val desiredWidth = (measuredHeight * xToYRatio).roundToInt()
+            val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&
+                MeasureSpec.getSize(widthMeasureSpec) != 0
+            ) {
+                resolveSizeAndState(
+                    desiredWidth,
+                    widthMeasureSpec,
+                    measuredState
+                ) or MEASURED_SIZE_MASK
+            } else {
+                desiredWidth
+            }
+
+            setMeasuredDimension(width, measuredHeight)
+        } else {
+            setMeasuredDimension(measuredHeight, measuredHeight)
+        }
+    }
+
+    private fun drawPlus(canvas: Canvas) {
+        canvas.drawRect(
+            (3.5 * width / 8.0).roundToInt().toFloat(),
+            (2.0 * width / 8.0).roundToInt().toFloat(),
+            (4.5 * width / 8.0).roundToInt().toFloat(),
+            (6.0 * width / 8.0).roundToInt().toFloat(),
+            linePaint
+        )
+        canvas.drawRect(
+            (2.0 * width / 8.0).roundToInt().toFloat(),
+            (3.5 * width / 8.0).roundToInt().toFloat(),
+            (6.0 * width / 8.0).roundToInt().toFloat(),
+            (4.5 * width / 8.0).roundToInt().toFloat(),
+            linePaint
+        )
+    }
 
 }

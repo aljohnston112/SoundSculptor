@@ -24,7 +24,7 @@ class MainRecyclerViewAdapter:
     }
 
     override fun getItemCount(): Int {
-        return getNumEnvelopes()
+        return getNumEnvelopes() + 2
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
