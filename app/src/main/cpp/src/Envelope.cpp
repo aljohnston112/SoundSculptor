@@ -1,4 +1,40 @@
 #include "Envelope.h"
+#include "VectorGenerator.h"
+
+std::shared_ptr<Envelope> createEnvelope(
+        std::vector<FunctionType> functions,
+        std::vector<std::vector<double>> functionArguments,
+        int64_t sampleRate
+) {
+
+    // Make attack segment
+    std::shared_ptr<std::vector<double>> attack = generateSegment(
+            functions.at(0),
+            functionArguments.at(0),
+            sampleRate
+    );
+
+    // Make sustain segment
+    std::shared_ptr<std::vector<double>> sustain = generateSegment(
+            functions.at(1),
+            functionArguments.at(1),
+            sampleRate
+    );
+
+    // Make release segment
+    std::shared_ptr<std::vector<double>> release = generateSegment(
+            functions.at(2),
+            functionArguments.at(2),
+            sampleRate
+    );
+
+    return std::make_shared<Envelope>(
+            attack,
+            sustain,
+            release,
+            true
+    );
+}
 
 Envelope::Envelope(
         std::shared_ptr<std::vector<double>> attack,
@@ -15,30 +51,30 @@ Envelope::Envelope(
             std::begin(*this->attack),
             std::end(*this->attack)
     );
-    if(min_max.first != std::end(*this->attack)) {
+    if (min_max.first != std::end(*this->attack)) {
         min = *min_max.first;
     }
-    if(min_max.second != std::end(*this->attack)) {
+    if (min_max.second != std::end(*this->attack)) {
         max = *min_max.second;
     }
     auto sustain_min_max = std::minmax_element(
             std::begin(*this->sustain),
             std::end(*this->sustain)
     );
-    if(sustain_min_max.first != std::end(*this->sustain)) {
+    if (sustain_min_max.first != std::end(*this->sustain)) {
         min = std::min(min, *sustain_min_max.first);
     }
-    if(sustain_min_max.second != std::end(*this->sustain)) {
+    if (sustain_min_max.second != std::end(*this->sustain)) {
         max = std::max(max, *sustain_min_max.second);
     }
     auto release_min_max = std::minmax_element(
             std::begin(*this->release),
             std::end(*this->release)
     );
-    if(release_min_max.first != std::end(*this->release)) {
+    if (release_min_max.first != std::end(*this->release)) {
         min = std::min(min, *release_min_max.first);
     }
-    if(release_min_max.second != std::end(*this->release)) {
+    if (release_min_max.second != std::end(*this->release)) {
         max = std::max(max, *release_min_max.second);
     }
 }

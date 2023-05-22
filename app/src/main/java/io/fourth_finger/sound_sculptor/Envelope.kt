@@ -7,13 +7,22 @@ class Envelope {
         FREQUENCY(1)
     }
 
+    enum class FunctionType(val value: Int){
+        LINEAR(0),
+        QUADRATIC(1)
+    }
+
     companion object {
-        public fun getIntForFunction(function: String): Int {
-            return when(function){
-                "Linear" -> 0
-                else -> 0
+        fun getFunctionType(functionString: String): FunctionType {
+            return if(functionString.lowercase() == "linear"){
+                FunctionType.LINEAR
+            } else if(functionString.lowercase() == "quadratic"){
+                FunctionType.QUADRATIC
+            } else {
+                FunctionType.LINEAR
             }
         }
+
     }
 
 }

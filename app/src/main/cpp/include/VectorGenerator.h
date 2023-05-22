@@ -3,8 +3,13 @@
 
 #include <vector>
 
+enum class FunctionType{
+    LINEAR = 0,
+    QUADRATIC = 1
+};
+
 std::shared_ptr<std::vector<double>> generateSegment(
-        int function,
+        FunctionType function,
         std::vector<double> args,
         int64_t sampleRate
         );

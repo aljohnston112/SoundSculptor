@@ -3,6 +3,15 @@
 
 #include <vector>
 
+#include "VectorGenerator.h"
+
+class Envelope;
+std::shared_ptr<Envelope> createEnvelope(
+        std::vector<FunctionType> functions,
+        std::vector<std::vector<double>> functionArguments,
+        int64_t sampleRate
+);
+
 class Envelope {
 public:
 

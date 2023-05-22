@@ -12,94 +12,29 @@ std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
 std::unique_ptr<EnvelopeRepository> envelopeDataSource;
 
-std::shared_ptr<Envelope> make_envelope(
-        JNIEnv *env,
-        jintArray functionEnumArray,
-        jobjectArray functionArguments
-) {
-    // Get function enums
-    jint *enumElements = env->GetIntArrayElements(functionEnumArray, nullptr);
-    int firstFunction = enumElements[0];
-    int secondFunction = enumElements[1];
-    int thirdFunction = enumElements[2];
-    env->ReleaseIntArrayElements(
-            functionEnumArray,
-            enumElements,
-            0
-    );
 
-    // Make attack segment
-    auto jAttackFunctionArgs = static_cast<jdoubleArray>(
-            env->GetObjectArrayElement(functionArguments, 0)
-    );
-    std::vector<double> attackFunctionArgs = convertToArray(
-            env,
-            jAttackFunctionArgs
-    );
-    std::shared_ptr<std::vector<double>> attack = generateSegment(
-            firstFunction,
-            attackFunctionArgs,
-            kSampleRate
-    );
-
-    // Make sustain segment
-    auto jSustainFunctionArgs = static_cast<jdoubleArray>(
-            env->GetObjectArrayElement(functionArguments, 1)
-    );
-    std::vector<double> sustainFunctionArgs = convertToArray(
-            env,
-            jSustainFunctionArgs
-    );
-    std::shared_ptr<std::vector<double>> sustain = generateSegment(
-            secondFunction,
-            sustainFunctionArgs,
-            kSampleRate
-    );
-
-    // Make release segment
-    auto jReleaseFunctionArgs = static_cast<jdoubleArray>(
-            env->GetObjectArrayElement(functionArguments, 2)
-    );
-    std::vector<double> releaseFunctionArgs = convertToArray(
-            env,
-            jReleaseFunctionArgs
-    );
-    releaseFunctionArgs.push_back(releaseFunctionArgs[1]);
-    releaseFunctionArgs[1] = releaseFunctionArgs[0];
-    releaseFunctionArgs[0] = sustainFunctionArgs[1];
-    std::shared_ptr<std::vector<double>> release = generateSegment(
-            thirdFunction,
-            releaseFunctionArgs,
-            kSampleRate
-    );
-
-    return std::make_shared<Envelope>(
-            attack,
-            sustain,
-            release,
-            true
-    );
-}
-
+// TODO remove the envelopes
 extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
         JNIEnv *env,
         jobject /* this */,
-        jintArray functionEnumArrayFrequency,
+        jobjectArray functionEnumArrayFrequency,
         jobjectArray functionArgumentsFrequency,
-        jintArray functionEnumArrayAmplitude,
+        jobjectArray functionEnumArrayAmplitude,
         jobjectArray functionArgumentsAmplitude
 ) {
     std::shared_ptr<Envelope> frequencyEnvelope = make_envelope(
             env,
             functionEnumArrayFrequency,
-            functionArgumentsFrequency
+            functionArgumentsFrequency,
+            kSampleRate
     );
 
     std::shared_ptr<Envelope> amplitudeEnvelope = make_envelope(
             env,
             functionEnumArrayAmplitude,
-            functionArgumentsAmplitude
+            functionArgumentsAmplitude,
+            kSampleRate
     );
 
     envelopeDataSource = std::make_unique<EnvelopeRepository>();
@@ -155,13 +90,14 @@ extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setAmplitudeEnvelope(
         JNIEnv *env,
         jobject /* this */,
-        jintArray functionEnumArray,
+        jobjectArray functionEnumArray,
         jobjectArray functionArguments
 ) {
     std::shared_ptr<Envelope> amplitudeEnvelope = make_envelope(
             env,
             functionEnumArray,
-            functionArguments
+            functionArguments,
+            kSampleRate
     );
     sineWaveGenerator->setAmplitudeEnvelope(amplitudeEnvelope);
 }
@@ -178,13 +114,14 @@ extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_EnvelopeFragment_setFrequencyEnvelope(
         JNIEnv *env,
         jobject /* this */,
-        jintArray functionEnumArray,
+        jobjectArray functionEnumArray,
         jobjectArray functionArguments
 ) {
     std::shared_ptr<Envelope> frequencyEnvelope = make_envelope(
             env,
             functionEnumArray,
-            functionArguments
+            functionArguments,
+            kSampleRate
     );
     sineWaveGenerator->setFrequencyEnvelope(frequencyEnvelope);
 }
@@ -199,14 +136,14 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_getSeconds(
     int enumValue = getEnumValue(env, envelopeTypeEnum);
 
     Envelope::EnvelopeType envelopeType;
-    double size;
+    int64_t size;
     if (enumValue == Envelope::EnvelopeType::AMPLITUDE) {
         size = envelopeDataSource->amplitude_envelope_size(column);
     } else {
         // enumValue == Envelope::EnvelopeType::FREQUENCY
         size = envelopeDataSource->frequency_envelope_size(column);
     }
-    return (size / kSampleRate);
+    return (static_cast<double>(size) / kSampleRate);
 
 }
 
@@ -223,7 +160,7 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_getGraph(
     // Get the envelope
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
     std::shared_ptr<Envelope> envelope;
-    if(envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
+    if (envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
         envelope = envelopeDataSource->get_amplitude_envelope(col);
     } else {
         // envelopeType == Envelope::EnvelopeType::FREQUENCY
@@ -276,7 +213,7 @@ Java_io_fourth_1finger_sound_1sculptor_FunctionView_isValidPosition(
 ) {
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
     bool isValid;
-    if(envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
+    if (envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
         isValid = column < envelopeDataSource->get_num_amplitude_envelopes();
     } else {
         // envelopeType == Envelope::EnvelopeType::FREQUENCY

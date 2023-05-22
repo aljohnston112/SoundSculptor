@@ -7,14 +7,14 @@ import io.fourth_finger.sound_sculptor.FileUtil.Companion.save
 import java.io.Serializable
 
 data class EnvelopeData(
-    val attackFunction: String,
+    val attackFunction: Envelope.FunctionType,
     val attackStart: Double,
     val attackEnd: Double,
     val attackTime: Double,
-    val sustainFunction: String,
+    val sustainFunction: Envelope.FunctionType,
     val sustainEnd: Double,
     val sustainTime: Double,
-    val releaseFunction: String,
+    val releaseFunction: Envelope.FunctionType,
     val releaseEnd: Double,
     val releaseTime: Double
 ) : Serializable

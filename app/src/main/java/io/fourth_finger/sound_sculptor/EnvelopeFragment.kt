@@ -9,18 +9,18 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import io.fourth_finger.sound_sculptor.Envelope.Companion.getIntForFunction
+import io.fourth_finger.sound_sculptor.Envelope.Companion.getFunctionType
 import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
 
 class EnvelopeFragment : Fragment() {
 
     private external fun setAmplitudeEnvelope(
-        functionEnumArray: IntArray,
+        functionEnumArray: Array<Envelope.FunctionType>,
         functionArguments: Array<DoubleArray>
     )
 
     private external fun setFrequencyEnvelope(
-        functionEnumArray: IntArray,
+        functionEnumArray: Array<Envelope.FunctionType>,
         functionArguments: Array<DoubleArray>
     )
 
@@ -87,9 +87,9 @@ class EnvelopeFragment : Fragment() {
             ) {
                 // TODO: Process the retrieved data accordingly
                 val envelopeData = EnvelopeData(
-                    attackFunction, attackStart, attackEnd, attackTime,
-                    sustainFunction, sustainEnd, sustainTime,
-                    releaseFunction, releaseEnd, releaseTime
+                    getFunctionType(attackFunction), attackStart, attackEnd, attackTime,
+                    getFunctionType(sustainFunction), sustainEnd, sustainTime,
+                    getFunctionType(releaseFunction), releaseEnd, releaseTime
                 )
                 processEnvelopeData(envelopeData)
             } else {
@@ -104,10 +104,10 @@ class EnvelopeFragment : Fragment() {
     }
 
     private fun processEnvelopeData(envelopeData: EnvelopeData) {
-        val functions = IntArray(3)
-        functions[0] = getIntForFunction(envelopeData.attackFunction)
-        functions[1] = getIntForFunction(envelopeData.sustainFunction)
-        functions[2] = getIntForFunction(envelopeData.releaseFunction)
+        val functions = Array(3){ Envelope.FunctionType.LINEAR }
+        functions[0] = envelopeData.attackFunction
+        functions[1] = envelopeData.sustainFunction
+        functions[2] = envelopeData.releaseFunction
 
         val functionArgs = Array(3) { DoubleArray(3) }
         functionArgs[0][0] = envelopeData.attackStart
