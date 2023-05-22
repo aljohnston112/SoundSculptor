@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.FloatBuffer
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
@@ -23,7 +25,7 @@ class FunctionView(
     attributeSet: AttributeSet
 ) : View(context, attributeSet) {
 
-    private var row: Int by Delegates.notNull()
+    private var envelopeType: Envelope.EnvelopeType by Delegates.notNull()
     private var col: Int by Delegates.notNull()
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -31,6 +33,11 @@ class FunctionView(
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private val borderStrokeWidth = 8;
+
+    private var directFloatBuffer: FloatBuffer = ByteBuffer.allocateDirect(
+        width * 4
+    ).order(ByteOrder.nativeOrder()).asFloatBuffer()
+    private val envelopePath = Path()
 
     init {
         linePaint.color = context.getColor(R.color.purple_200)
@@ -45,62 +52,62 @@ class FunctionView(
         textPaint.color = Color.BLACK
     }
 
-    private external fun getXToYRatio(
-        row: Int,
+    private external fun getSeconds(
+        envelopeType: Envelope.EnvelopeType,
         col: Int
     ): Double
 
     private external fun getGraph(
         byteBuffer: Buffer,
-        row: Int,
+        envelopeType: Envelope.EnvelopeType,
         col: Int,
         width: Int,
         height: Int
     ): FloatArray
 
     private external fun isValidPosition(
-        row: Int,
+        envelopeType: Envelope.EnvelopeType,
         col: Int
     ): Boolean
 
     private val xToYRatio: Double
         get() {
-            return getXToYRatio(row, col)
+            return getSeconds(envelopeType, col)
         }
 
     // TODO this is a bad solution
-    fun setPosition(row: Int, col: Int) {
-        this.row = row
+    fun update(envelopeType: Envelope.EnvelopeType, col: Int) {
+        this.envelopeType = envelopeType
         this.col = col
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        if(hasValidPosition()) {
-            val directFloatBuffer = ByteBuffer.allocateDirect(
+        if(hasValidPosition() && width > 0) {
+            directFloatBuffer = ByteBuffer.allocateDirect(
                 width * 4
             ).order(ByteOrder.nativeOrder()).asFloatBuffer()
-            val minMax = getGraph(directFloatBuffer, row, col, width, height)
+            envelopePath.rewind()
+            val minMax = getGraph(directFloatBuffer, envelopeType, col, width, height)
             val minY = minMax[0]
             val maxY = minMax[1]
             val yScale: Float = height / (maxY - minY)
-            var lastValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
+            val firstValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
+            envelopePath.moveTo(0F, firstValue)
             for (i in 1 until directFloatBuffer.capacity()) {
                 val currentValue = abs((directFloatBuffer[i] - minY) - (maxY - minY)) * yScale
-                canvas.drawLine(
-                    i.toFloat(),
-                    lastValue,
-                    (i + 1).toFloat(),
-                    currentValue,
-                    linePaint
-                )
-                lastValue = currentValue
+                envelopePath.lineTo(i.toFloat(), currentValue)
             }
+            invalidate()
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        if(hasValidPosition()){
+            canvas.drawPath(envelopePath, linePaint)
             drawYValues(
                 canvas,
                 directFloatBuffer[0],
                 directFloatBuffer[directFloatBuffer.capacity() - 1]
             )
-        } else {
+        }
+        else if(!hasValidPosition()){
             drawPlus(canvas)
         }
         drawBorder(canvas)
@@ -179,7 +186,7 @@ class FunctionView(
     }
 
     private fun hasValidPosition(): Boolean {
-        return isValidPosition(row, col)
+        return isValidPosition(envelopeType, col)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -205,6 +212,12 @@ class FunctionView(
         } else {
             setMeasuredDimension(measuredHeight, measuredHeight)
         }
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        update(envelopeType, col)
+        invalidate()
     }
 
     private fun drawPlus(canvas: Canvas) {

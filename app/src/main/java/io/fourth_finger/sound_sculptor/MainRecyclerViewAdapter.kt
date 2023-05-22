@@ -28,11 +28,12 @@ class MainRecyclerViewAdapter:
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val numRows = 2
-        val row = position % numRows
-        val col = position.floorDiv(numRows)
-        holder.functionView.setPosition(row, col)
-        holder.functionView.invalidate()
+        val envelopeTypeValues = Envelope.EnvelopeType.values()
+        val numRows = envelopeTypeValues.size
+        val envelopeType = Envelope.EnvelopeType.values()[position % numRows]
+
+        val column = position.floorDiv(numRows)
+        holder.functionView.update(envelopeType, column)
     }
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {

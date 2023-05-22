@@ -24,6 +24,7 @@ add_library( # Sets the name of the library.
         src/native-lib.cpp
         src/AudioPlayer.cpp
         src/Envelope.cpp
+        src/EnvelopeRepository.cpp
         src/SineWaveGenerator.cpp
         src/VectorGenerator.cpp)
 

@@ -6,6 +6,11 @@
 class Envelope {
 public:
 
+    enum EnvelopeType {
+        AMPLITUDE = 0,
+        FREQUENCY = 1
+    };
+
     /**
      * @brief Constructs an Envelope instance.
      *
@@ -46,7 +51,7 @@ public:
 
     double getMax(){ return max; }
 
-    int getSize(){ return attack->size() + sustain->size() + release->size(); }
+    int size(){ return attack->size() + sustain->size() + release->size(); }
 
 private:
     std::shared_ptr<std::vector<double>> attack;
