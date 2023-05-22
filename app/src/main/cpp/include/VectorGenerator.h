@@ -3,6 +3,12 @@
 
 #include <vector>
 
+std::shared_ptr<std::vector<double>> generateSegment(
+        int function,
+        std::vector<double> args,
+        int64_t sampleRate
+        );
+
 /**
  * @class VectorGenerator
  * @brief A utility class for generating segments of doubles.

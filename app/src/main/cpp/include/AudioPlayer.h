@@ -1,10 +1,8 @@
 #ifndef SOUNDSCULPTOR_AUDIOPLAYER_H
 #define SOUNDSCULPTOR_AUDIOPLAYER_H
 
-#include <jni.h>
 #include "/oboe/Oboe.h"
 #include <cmath>
-#include <memory>
 #include "../include/Envelope.h"
 #include "../include/SineWaveGenerator.h"
 #include "../include/VectorGenerator.h"

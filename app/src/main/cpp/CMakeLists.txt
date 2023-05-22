@@ -25,6 +25,7 @@ add_library( # Sets the name of the library.
         src/AudioPlayer.cpp
         src/Envelope.cpp
         src/EnvelopeRepository.cpp
+        src/JNIUtil.cpp
         src/SineWaveGenerator.cpp
         src/VectorGenerator.cpp)
 

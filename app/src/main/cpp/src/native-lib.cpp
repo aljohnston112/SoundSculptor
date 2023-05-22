@@ -3,6 +3,7 @@
 
 #include "AudioPlayer.h"
 #include "EnvelopeRepository.h"
+#include "JNIUtil.h"
 
 constexpr int kSampleRate = 44100;
 constexpr int kChannelCount = 1;
@@ -10,32 +11,6 @@ constexpr int kChannelCount = 1;
 std::unique_ptr<AudioPlayer> audioPlayer;
 std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
 std::unique_ptr<EnvelopeRepository> envelopeDataSource;
-
-std::vector<double> convertToArray(JNIEnv *env, jdoubleArray jDoubleArrayArgs) {
-    std::vector<double> doubles(env->GetArrayLength(jDoubleArrayArgs));
-    jdouble *elements = env->GetDoubleArrayElements(jDoubleArrayArgs, nullptr);
-    for (int i = 0; i < env->GetArrayLength(jDoubleArrayArgs); ++i) {
-        doubles[i] = (elements[i]);
-    }
-    env->ReleaseDoubleArrayElements(jDoubleArrayArgs, elements, 0);
-    return doubles;
-}
-
-std::shared_ptr<std::vector<double>> generateSegment(int function, std::vector<double> args) {
-    std::shared_ptr<std::vector<double>> segment;
-    double time = args.at(2);
-    int numSamples = static_cast<int>(std::round(static_cast<double>(kSampleRate) * time));
-    switch (function) {
-        case 0:
-            segment = VectorGenerator::generateLinearSegment(
-                    args.at(0),
-                    args.at(1),
-                    numSamples
-            );
-            break;
-    }
-    return segment;
-}
 
 std::shared_ptr<Envelope> make_envelope(
         JNIEnv *env,
@@ -63,7 +38,8 @@ std::shared_ptr<Envelope> make_envelope(
     );
     std::shared_ptr<std::vector<double>> attack = generateSegment(
             firstFunction,
-            attackFunctionArgs
+            attackFunctionArgs,
+            kSampleRate
     );
 
     // Make sustain segment
@@ -76,7 +52,8 @@ std::shared_ptr<Envelope> make_envelope(
     );
     std::shared_ptr<std::vector<double>> sustain = generateSegment(
             secondFunction,
-            sustainFunctionArgs
+            sustainFunctionArgs,
+            kSampleRate
     );
 
     // Make release segment
@@ -92,7 +69,8 @@ std::shared_ptr<Envelope> make_envelope(
     releaseFunctionArgs[0] = sustainFunctionArgs[1];
     std::shared_ptr<std::vector<double>> release = generateSegment(
             thirdFunction,
-            releaseFunctionArgs
+            releaseFunctionArgs,
+            kSampleRate
     );
 
     return std::make_shared<Envelope>(
@@ -101,22 +79,6 @@ std::shared_ptr<Envelope> make_envelope(
             release,
             true
     );
-}
-
-int getEnumValue(JNIEnv *env, jobject enumObject) {
-    jclass enumClass = env->GetObjectClass(
-            enumObject
-    );
-    jmethodID getValueMethod = env->GetMethodID(
-            enumClass,
-            "getValue",
-            "()I"
-    );
-    jint enumValue = env->CallIntMethod(
-            enumObject,
-            getValueMethod
-    );
-    return enumValue;
 }
 
 extern "C" JNIEXPORT void JNICALL

@@ -1,4 +1,25 @@
+#include <cmath>
 #include "VectorGenerator.h"
+
+std::shared_ptr<std::vector<double>> generateSegment(
+        int function,
+        std::vector<double> args,
+        int64_t sampleRate
+) {
+    std::shared_ptr<std::vector<double>> segment;
+    double time = args.at(2);
+    int numSamples = static_cast<int>(std::round(static_cast<double>(sampleRate) * time));
+    switch (function) {
+        case 0:
+            segment = VectorGenerator::generateLinearSegment(
+                    args.at(0),
+                    args.at(1),
+                    numSamples
+            );
+            break;
+    }
+    return segment;
+}
 
 std::shared_ptr<std::vector<double>> VectorGenerator::generateConstantSegment(
         double constant,
