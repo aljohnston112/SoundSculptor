@@ -3,7 +3,7 @@ package io.fourth_finger.sound_sculptor
 import android.content.Context
 import java.io.*
 
-private const val N_BACKUPS = 2
+private const val NUM_BACKUPS = 2
 
 class FileUtil {
 
@@ -12,11 +12,11 @@ class FileUtil {
         private val fileLock = Any()
 
         /**
-         * Returns a [List] of strings appending a number 0 through [N_BACKUPS] to [fileName]
+         * Returns a [List] of strings appending a number 0 through [NUM_BACKUPS] to [fileName]
          */
         private fun getFileNames(fileName: String): List<String> {
             val list = mutableListOf<String>()
-            for (i in 0..N_BACKUPS) {
+            for (i in 0..NUM_BACKUPS) {
                 list.add(fileName + i.toString())
             }
             return list

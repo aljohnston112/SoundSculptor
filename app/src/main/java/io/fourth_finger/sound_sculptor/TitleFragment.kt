@@ -24,7 +24,11 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTitleBinding.inflate(inflater, container, false)
+        _binding = FragmentTitleBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding.root
     }
 
@@ -55,6 +59,5 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
         super.onDestroyView()
         _binding = null
     }
-
 
 }

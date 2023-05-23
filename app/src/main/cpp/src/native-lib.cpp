@@ -13,39 +13,16 @@ std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
 std::unique_ptr<EnvelopeRepository> envelopeDataSource;
 
 
-// TODO remove the envelopes
 extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_MainActivity_init(
         JNIEnv *env,
-        jobject /* this */,
-        jobjectArray functionEnumArrayFrequency,
-        jobjectArray functionArgumentsFrequency,
-        jobjectArray functionEnumArrayAmplitude,
-        jobjectArray functionArgumentsAmplitude
+        jobject /* this */
 ) {
-    std::shared_ptr<Envelope> frequencyEnvelope = make_envelope(
-            env,
-            functionEnumArrayFrequency,
-            functionArgumentsFrequency,
-            kSampleRate
-    );
-
-    std::shared_ptr<Envelope> amplitudeEnvelope = make_envelope(
-            env,
-            functionEnumArrayAmplitude,
-            functionArgumentsAmplitude,
-            kSampleRate
-    );
-
     envelopeDataSource = std::make_unique<EnvelopeRepository>();
-    envelopeDataSource->push_back_amplitude_envelope(amplitudeEnvelope);
-    envelopeDataSource->push_back_frequency_envelope(frequencyEnvelope);
 
     sineWaveGenerator = std::make_shared<SineWaveGenerator>(
             kChannelCount,
-            kSampleRate,
-            frequencyEnvelope,
-            amplitudeEnvelope
+            kSampleRate
     );
 }
 

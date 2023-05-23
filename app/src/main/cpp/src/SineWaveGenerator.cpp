@@ -9,18 +9,12 @@ static constexpr double kTwoPi = kPI * 2;
  *
  * @param channelCount The number of audio channels.
  * @param sampleRate The sample rate of the audio.
- * @param frequencyEnvelope The envelope controlling the frequency modulation.
- * @param amplitudeEnvelope The envelope controlling the amplitude modulation.
  */
 SineWaveGenerator::SineWaveGenerator(
         int channelCount,
-        int sampleRate,
-        std::shared_ptr<Envelope> frequencyEnvelope,
-        std::shared_ptr<Envelope> amplitudeEnvelope
+        int sampleRate
 ) : channelCount(channelCount),
     sampleRate(sampleRate),
-    frequencyEnvelope(std::move(frequencyEnvelope)),
-    amplitudeEnvelope(std::move(amplitudeEnvelope)),
     currentPhase(0.0) {}
 
 /**

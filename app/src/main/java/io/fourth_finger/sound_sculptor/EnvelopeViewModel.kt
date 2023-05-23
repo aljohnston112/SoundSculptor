@@ -5,26 +5,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class EnvelopeViewModel(private val envelopeRepository: EnvelopeRepository) : ViewModel() {
+class EnvelopeViewModel(
+    private val envelopeRepository: EnvelopeRepository
+) : ViewModel() {
 
-    fun getEnvelopeData(context: Context, name: String) {
+    private fun loadEnvelopeData(context: Context, name: String) {
         viewModelScope.launch {
             val envelopeData = envelopeRepository.getEnvelopeData(context, name)
-            // Handle the retrieved envelope data, update the UI, etc.
+            // TODO Do something with the data
         }
     }
 
-    fun saveEnvelopeData(context: Context, envelopeData: EnvelopeData, name: String) {
+    private fun saveEnvelopeData(
+        context: Context,
+        envelopeData: List<EnvelopeData>,
+        name: String
+    ) {
         viewModelScope.launch {
             envelopeRepository.saveEnvelopeData(context, envelopeData, name)
-            // Handle the successful save, update the UI, etc.
         }
     }
 
-    fun deleteEnvelopeData(context: Context, name: String) {
-        viewModelScope.launch {
-            envelopeRepository.deleteEnvelopeData(context, name)
-            // Handle the successful deletion, update the UI, etc.
-        }
-    }
 }

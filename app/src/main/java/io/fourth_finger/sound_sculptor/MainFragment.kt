@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
 import io.fourth_finger.sound_sculptor.databinding.FragmentMainBinding
 
+/**
+ * A fragment for display the current envelopes.
+ */
 class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null

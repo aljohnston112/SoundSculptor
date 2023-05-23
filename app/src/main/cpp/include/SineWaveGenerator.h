@@ -33,9 +33,7 @@ public:
      */
     explicit SineWaveGenerator(
             int channelCount,
-            int sampleRate,
-            std::shared_ptr<Envelope> frequencyEnvelope,
-            std::shared_ptr<Envelope> amplitudeEnvelope
+            int sampleRate
     );
 
     /**

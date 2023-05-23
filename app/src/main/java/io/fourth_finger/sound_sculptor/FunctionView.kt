@@ -16,13 +16,16 @@ import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 /**
- * A Surface view that draws graphs that correspond to the envelopes on the NDK side.
- * setPosition must be called before this view is drawn.
+ * A Surface view that draws graphs that represent the
+ * envelopes on the NDK side.
+ * [update] must be called before this view is drawn.
  */
 class FunctionView(
     context: Context,
     attributeSet: AttributeSet
 ) : View(context, attributeSet) {
+
+    // TODO split this into two View classes.
 
     private var envelopeType: Envelope.EnvelopeType by Delegates.notNull()
     private var col: Int by Delegates.notNull()

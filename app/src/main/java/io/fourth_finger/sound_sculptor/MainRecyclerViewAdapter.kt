@@ -5,6 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * Used to display one envelope graph.
+ */
 class MainRecyclerViewAdapter:
     RecyclerView.Adapter<MainRecyclerViewAdapter.ViewHolder>() {
 
@@ -36,6 +39,7 @@ class MainRecyclerViewAdapter:
         holder.functionView.update(envelopeType, column)
     }
 
+    // TODO Split the amplitude and frequency envelopes
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val functionView: FunctionView
 

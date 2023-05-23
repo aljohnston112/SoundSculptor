@@ -12,6 +12,9 @@ import androidx.navigation.fragment.navArgs
 import io.fourth_finger.sound_sculptor.Envelope.Companion.getFunctionType
 import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
 
+/**
+ * A Fragment for creating new envelopes.
+ */
 class EnvelopeFragment : Fragment() {
 
     private external fun setAmplitudeEnvelope(
@@ -53,7 +56,9 @@ class EnvelopeFragment : Fragment() {
             R.array.functions_array,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
             binding.spinnerAttackFunction.adapter = adapter
             binding.spinnerSustainFunction.adapter = adapter
             binding.spinnerReleaseFunction.adapter = adapter
@@ -61,12 +66,12 @@ class EnvelopeFragment : Fragment() {
 
 
         binding.appCompatButton.setOnClickListener {
-            // Retrieve selected item from spinner for each envelope stage
+            // Retrieve selected functions from the spinner for each envelope stage
             val attackFunction = binding.spinnerAttackFunction.selectedItem?.toString()
             val sustainFunction = binding.spinnerSustainFunction.selectedItem?.toString()
             val releaseFunction = binding.spinnerReleaseFunction.selectedItem?.toString()
 
-            // Retrieve values from text input fields for each envelope stage
+            // Retrieve function parameters from the text input fields for each envelope stage
             val attackStart = binding.filledTextFieldAttackStart.editText?.text?.toString()?.toDoubleOrNull()
             val attackEnd = binding.filledTextFieldAttackEnd.editText?.text?.toString()?.toDoubleOrNull()
             val attackTime = binding.filledTextFieldAttackTime.editText?.text?.toString()?.toDoubleOrNull()
@@ -78,8 +83,6 @@ class EnvelopeFragment : Fragment() {
             val releaseTime = binding.filledTextFieldReleaseTime.editText?.text?.toString()?.toDoubleOrNull()
 
             // TODO Perform data validation
-
-            // Process the retrieved data
             if (
                 attackFunction != null && attackStart != null && attackEnd != null && attackTime != null &&
                 sustainFunction != null && sustainEnd != null && sustainTime != null &&
@@ -87,10 +90,18 @@ class EnvelopeFragment : Fragment() {
             ) {
                 // TODO: Process the retrieved data accordingly
                 val envelopeData = EnvelopeData(
-                    getFunctionType(attackFunction), attackStart, attackEnd, attackTime,
-                    getFunctionType(sustainFunction), sustainEnd, sustainTime,
-                    getFunctionType(releaseFunction), releaseEnd, releaseTime
+                    getFunctionType(attackFunction),
+                    attackStart,
+                    attackEnd,
+                    attackTime,
+                    getFunctionType(sustainFunction),
+                    sustainEnd,
+                    sustainTime,
+                    getFunctionType(releaseFunction),
+                    releaseEnd,
+                    releaseTime
                 )
+
                 processEnvelopeData(envelopeData)
             } else {
                 Toast.makeText(
@@ -104,6 +115,7 @@ class EnvelopeFragment : Fragment() {
     }
 
     private fun processEnvelopeData(envelopeData: EnvelopeData) {
+        // TODO Pass the envelope data directly
         val functions = Array(3){ Envelope.FunctionType.LINEAR }
         functions[0] = envelopeData.attackFunction
         functions[1] = envelopeData.sustainFunction

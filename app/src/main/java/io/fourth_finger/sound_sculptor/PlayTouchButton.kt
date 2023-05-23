@@ -5,7 +5,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatButton
 
-class PlayTouchButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
+/**
+ * Used to play the current envelopes.
+ */
+class PlayTouchButton(
+    context: Context,
+    attrs: AttributeSet
+) : AppCompatButton(context, attrs) {
     private external fun startPlaying()
     private external fun triggerRelease()
 
@@ -14,8 +20,8 @@ class PlayTouchButton(context: Context, attrs: AttributeSet) : AppCompatButton(c
     override fun onTouchEvent(event: MotionEvent): Boolean {
         super.onTouchEvent(event)
 
-        // Listening for the down and up touch events.
         return when (event.action) {
+
             MotionEvent.ACTION_DOWN -> {
                 downTouch = true
                 startPlaying()
@@ -24,26 +30,20 @@ class PlayTouchButton(context: Context, attrs: AttributeSet) : AppCompatButton(c
 
             MotionEvent.ACTION_UP -> if (downTouch) {
                 downTouch = false
-                performClick() // Call this method to handle the response and
-                // enable accessibility services to
-                // perform this action for a user who can't
-                // tap the touchscreen.
+                performClick()
                 true
             } else {
                 false
             }
 
-            else -> false  // Return false for other touch events.
+            else -> false
         }
     }
 
     override fun performClick(): Boolean {
-        // Calls the super implementation, which generates an AccessibilityEvent
-        // and calls the onClick() listener on the view, if any.
         super.performClick()
-
         triggerRelease()
-
         return true
     }
+
 }

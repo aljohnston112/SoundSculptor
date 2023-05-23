@@ -8,12 +8,7 @@ import io.fourth_finger.sound_sculptor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private external fun init(
-        functionEnumsAmplitude: Array<Envelope.FunctionType>,
-        functionArgsAmplitude: Array<DoubleArray>,
-        functionEnumsFrequency: Array<Envelope.FunctionType>,
-        functionArgsFrequency: Array<DoubleArray>
-    )
+    private external fun init()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -27,6 +22,7 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
         )
+        init()
 
         val functionEnums = Array(3) { Envelope.FunctionType.LINEAR }
         val functionArgsFrequency = arrayOf(
@@ -38,8 +34,9 @@ class MainActivity : AppCompatActivity() {
             doubleArrayOf(0.0, 1.0, 1.0),
             doubleArrayOf(1.0, 1.0, 0.0),
             doubleArrayOf(1.0, 0.0, 1.0),
-            )
-        init(functionEnums, functionArgsFrequency, functionEnums, functionArgsAmplitude)
+        )
+        init()
+
     }
 
     companion object {
