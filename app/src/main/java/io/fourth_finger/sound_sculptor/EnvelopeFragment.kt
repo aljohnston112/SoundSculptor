@@ -17,16 +17,6 @@ import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
  */
 class EnvelopeFragment : Fragment() {
 
-    private external fun setAmplitudeEnvelope(
-        functionEnumArray: Array<Envelope.FunctionType>,
-        functionArguments: Array<DoubleArray>
-    )
-
-    private external fun setFrequencyEnvelope(
-        functionEnumArray: Array<Envelope.FunctionType>,
-        functionArguments: Array<DoubleArray>
-    )
-
     private val args: EnvelopeFragmentArgs by navArgs()
 
     private var _binding: FragmentEnvelopeBinding? = null

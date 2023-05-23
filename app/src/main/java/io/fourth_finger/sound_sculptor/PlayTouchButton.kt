@@ -12,8 +12,6 @@ class PlayTouchButton(
     context: Context,
     attrs: AttributeSet
 ) : AppCompatButton(context, attrs) {
-    private external fun startPlaying()
-    private external fun triggerRelease()
 
     var downTouch = false
 

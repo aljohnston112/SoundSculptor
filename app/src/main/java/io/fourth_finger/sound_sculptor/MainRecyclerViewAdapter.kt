@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 class MainRecyclerViewAdapter:
     RecyclerView.Adapter<MainRecyclerViewAdapter.ViewHolder>() {
 
-    private external fun getNumEnvelopes(): Int
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

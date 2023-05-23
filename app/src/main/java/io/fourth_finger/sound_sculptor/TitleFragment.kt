@@ -10,8 +10,6 @@ import io.fourth_finger.sound_sculptor.databinding.FragmentTitleBinding
 
 class TitleFragment : Fragment(R.layout.fragment_title) {
 
-    private external fun stopPlaying()
-
     private var _binding: FragmentTitleBinding? = null
 
     private val binding get() = _binding!!

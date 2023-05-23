@@ -41,7 +41,7 @@ public:
             oboe::AudioStream *audioStream,
             void *audioData,
             int32_t numFrames
-    );
+    ) override;
 
     /**
     * @brief Stops and closes the audio stream.

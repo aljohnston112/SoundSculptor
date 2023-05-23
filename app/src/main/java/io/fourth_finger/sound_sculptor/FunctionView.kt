@@ -54,24 +54,6 @@ class FunctionView(
         textPaint.color = Color.BLACK
     }
 
-    private external fun getSeconds(
-        envelopeType: Envelope.EnvelopeType,
-        col: Int
-    ): Double
-
-    private external fun getGraph(
-        byteBuffer: Buffer,
-        envelopeType: Envelope.EnvelopeType,
-        col: Int,
-        width: Int,
-        height: Int
-    ): FloatArray
-
-    private external fun isValidPosition(
-        envelopeType: Envelope.EnvelopeType,
-        col: Int
-    ): Boolean
-
     private val xToYRatio: Double
         get() {
             return getSeconds(envelopeType, col)
