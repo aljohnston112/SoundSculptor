@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -60,22 +59,38 @@ class FunctionView(
         }
 
     // TODO this is a bad solution
-    fun update(envelopeType: Envelope.EnvelopeType, col: Int) {
+    fun update(envelopeType: Envelope.EnvelopeType, column: Int) {
         this.envelopeType = envelopeType
-        this.col = col
-        if(hasValidPosition() && width > 0) {
+        this.col = column
+        if (hasValidPosition() && width > 0) {
             directFloatBuffer = ByteBuffer.allocateDirect(
                 width * 4
             ).order(ByteOrder.nativeOrder()).asFloatBuffer()
             envelopePath.rewind()
-            val minMax = getGraph(directFloatBuffer, envelopeType, col, width, height)
-            val minY = minMax[0]
-            val maxY = minMax[1]
+            val minMax = getGraph(
+                directFloatBuffer,
+                envelopeType,
+                column,
+                width
+            )
+            var minY = minMax[0]
+            var maxY = minMax[1]
+
+            // Add room around constant
+            if (minY == maxY) {
+                minY += 1.0f
+                maxY += 1.0f
+            }
+
             val yScale: Float = height / (maxY - minY)
-            val firstValue = abs((directFloatBuffer[0] - minY) - (maxY - minY)) * yScale
+            val firstValue = abs(
+                (directFloatBuffer[0] - minY) - (maxY - minY)
+            ) * yScale
             envelopePath.moveTo(0F, firstValue)
             for (i in 1 until directFloatBuffer.capacity()) {
-                val currentValue = abs((directFloatBuffer[i] - minY) - (maxY - minY)) * yScale
+                val currentValue = abs(
+                    (directFloatBuffer[i] - minY) - (maxY - minY)
+                ) * yScale
                 envelopePath.lineTo(i.toFloat(), currentValue)
             }
             invalidate()
@@ -83,15 +98,14 @@ class FunctionView(
     }
 
     override fun onDraw(canvas: Canvas) {
-        if(hasValidPosition()){
+        if (hasValidPosition()) {
             canvas.drawPath(envelopePath, linePaint)
             drawYValues(
                 canvas,
                 directFloatBuffer[0],
                 directFloatBuffer[directFloatBuffer.capacity() - 1]
             )
-        }
-        else if(!hasValidPosition()){
+        } else if (!hasValidPosition()) {
             drawPlus(canvas)
         }
         drawBorder(canvas)
@@ -177,7 +191,7 @@ class FunctionView(
         // Want to keep height
         val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)
 
-        if(hasValidPosition()) {
+        if (hasValidPosition()) {
             // Sacrifice width if needed
             val desiredWidth = (measuredHeight * xToYRatio).roundToInt()
             val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&

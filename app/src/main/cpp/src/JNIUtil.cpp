@@ -1,36 +1,29 @@
+#include <utility>
 #include <vector>
 #include "../include/JNIUtil.h"
 #include "Envelope.h"
 
-std::shared_ptr<Envelope> make_envelope(
+std::vector<FunctionType> convertToFunctionTypeVector(
         JNIEnv *env,
-        jobjectArray functionEnumArray,
-        jobjectArray functionArgumentsArray,
-        int64_t sampleRate
+        jobjectArray functionEnumArray
 ) {
-    // Get function enums
-    std::vector<jobject> enumElements = convertToVector(env, functionEnumArray);
+    std::vector<jobject> enumElements = convertToVector(
+            env,
+            functionEnumArray
+    );
     std::vector<FunctionType> functions{};
     for (auto &enumElement: enumElements) {
         int enumValue = getEnumValue(env, enumElement);
         auto functionType = static_cast<FunctionType>(enumValue);
         functions.push_back(functionType);
     }
-
-    // Get function arguments
-    std::vector<std::vector<double>> functionArguments = convertTo2DVector(
-            env,
-            functionArgumentsArray
-    );
-
-    return createEnvelope(
-            functions,
-            functionArguments,
-            sampleRate
-    );
+    return functions;
 }
 
-std::vector<std::vector<double>> convertTo2DVector(JNIEnv *env, jobjectArray jArray) {
+std::vector<std::vector<double>> convertTo2DVector(
+        JNIEnv *env,
+        jobjectArray jArray
+) {
     jsize arrayLength = env->GetArrayLength(jArray);
     std::vector<std::vector<double>> jobjects{};
     for (int i = 0; i < arrayLength; ++i) {

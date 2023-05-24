@@ -1,29 +1,28 @@
 #include "Envelope.h"
 #include "VectorGenerator.h"
 
-std::shared_ptr<Envelope> createEnvelope(
-        std::vector<FunctionType> functions,
+std::shared_ptr<Envelope> make_envelope(
+        std::vector<FunctionType> functionTypes,
         std::vector<std::vector<double>> functionArguments,
         int64_t sampleRate
 ) {
-
     // Make attack segment
     std::shared_ptr<std::vector<double>> attack = generateSegment(
-            functions.at(0),
+            functionTypes.at(0),
             functionArguments.at(0),
             sampleRate
     );
 
     // Make sustain segment
     std::shared_ptr<std::vector<double>> sustain = generateSegment(
-            functions.at(1),
+            functionTypes.at(1),
             functionArguments.at(1),
             sampleRate
     );
 
     // Make release segment
     std::shared_ptr<std::vector<double>> release = generateSegment(
-            functions.at(2),
+            functionTypes.at(2),
             functionArguments.at(2),
             sampleRate
     );
@@ -34,6 +33,8 @@ std::shared_ptr<Envelope> createEnvelope(
             release,
             true
     );
+}
+
 }
 
 Envelope::Envelope(

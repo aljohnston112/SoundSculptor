@@ -7,7 +7,7 @@
 
 class Envelope;
 
-std::shared_ptr<Envelope> createEnvelope(
+std::shared_ptr<Envelope> make_envelope(
         std::vector<FunctionType> functions,
         std::vector<std::vector<double>> functionArguments,
         int64_t sampleRate

@@ -22,7 +22,6 @@ external fun getGraph(
     envelopeType: Envelope.EnvelopeType,
     col: Int,
     width: Int,
-    height: Int
 ): FloatArray
 
 external fun isValidPosition(
