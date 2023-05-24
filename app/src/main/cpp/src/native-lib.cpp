@@ -14,9 +14,9 @@ std::unique_ptr<EnvelopeRepository> envelopeDataSource;
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_init(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_init(
         JNIEnv *env,
-        jobject /* this */
+        jclass  /* this */
 ) {
     envelopeDataSource = std::make_unique<EnvelopeRepository>();
 
@@ -27,9 +27,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_init(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_startPlaying(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_startPlaying(
         JNIEnv *env,
-        jobject /* this */
+        jclass  /* this */
 ) {
     audioPlayer = std::make_unique<AudioPlayer>(
             sineWaveGenerator,
@@ -39,17 +39,17 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_startPlaying(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_triggerRelease(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_triggerRelease(
         JNIEnv *env,
-        jobject /* this */
+        jclass  /* this */
 ) {
     sineWaveGenerator->triggerRelease();
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_stopPlaying(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_stopPlaying(
         JNIEnv *env,
-        jobject /* this */
+        jclass  /* this */
 ) {
     audioPlayer->reset();
     audioPlayer.reset();
@@ -64,9 +64,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_stopPlaying(
  *                          containing the values needed to construct each function.
  */
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_setAmplitudeEnvelope(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setAmplitudeEnvelope(
         JNIEnv *env,
-        jobject /* this */,
+        jclass  /* this */,
         jobjectArray functionEnumArray,
         jobjectArray functionArguments
 ) {
@@ -88,9 +88,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_setAmplitudeEnvelope(
  *                          containing the values needed to construct each function.
  */
 extern "C" JNIEXPORT void JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_setFrequencyEnvelope(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setFrequencyEnvelope(
         JNIEnv *env,
-        jobject /* this */,
+        jclass  /* this */,
         jobjectArray functionEnumArray,
         jobjectArray functionArguments
 ) {
@@ -104,9 +104,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_setFrequencyEnvelope(
 }
 
 extern "C" JNIEXPORT double JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_getSeconds(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getSeconds(
         JNIEnv *env,
-        jobject clazz,
+        jclass clazz,
         jobject envelopeTypeEnum,
         int column
 ) {
@@ -125,9 +125,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_getSeconds(
 }
 
 extern "C" JNIEXPORT jfloatArray JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_getGraph(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
         JNIEnv *env,
-        jobject clazz,
+        jclass clazz,
         jobject buffer,
         jobject envelopeTypeEnum,
         int col,
@@ -174,17 +174,17 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_getGraph(
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_getNumEnvelopes(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumEnvelopes(
         JNIEnv *env,
-        jobject clazz
+        jclass clazz
 ) {
     return envelopeDataSource->get_num_envelopes();
 }
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctions_isValidPosition(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_isValidPosition(
         JNIEnv *env,
-        jobject clazz,
+        jclass clazz,
         jobject envelopeTypeEnum,
         jint column
 ) {

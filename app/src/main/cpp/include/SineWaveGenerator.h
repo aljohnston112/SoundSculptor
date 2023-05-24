@@ -3,7 +3,6 @@
 
 #include <cmath>
 
-#include "AudioConfig.h"
 #include "AudioGenerator.h"
 #include "Envelope.h"
 

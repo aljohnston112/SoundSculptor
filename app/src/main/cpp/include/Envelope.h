@@ -6,6 +6,7 @@
 #include "VectorGenerator.h"
 
 class Envelope;
+
 std::shared_ptr<Envelope> createEnvelope(
         std::vector<FunctionType> functions,
         std::vector<std::vector<double>> functionArguments,
