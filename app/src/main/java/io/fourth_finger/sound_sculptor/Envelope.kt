@@ -21,6 +21,12 @@ class Envelope {
         QUADRATIC(1)
     }
 
+    data class LinearFunctionParameters(
+        val startY :Double,
+        val endY :Double,
+        val seconds :Double
+    )
+
     companion object {
 
         /**

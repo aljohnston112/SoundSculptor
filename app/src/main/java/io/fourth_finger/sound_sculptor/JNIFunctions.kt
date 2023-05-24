@@ -4,12 +4,12 @@ import java.nio.Buffer
 
 external fun setAmplitudeEnvelope(
     functionEnumArray: Array<Envelope.FunctionType>,
-    functionArguments: Array<DoubleArray>
+    functionArguments: Array<Envelope.LinearFunctionParameters>
 )
 
 external fun setFrequencyEnvelope(
     functionEnumArray: Array<Envelope.FunctionType>,
-    functionArguments: Array<DoubleArray>
+    functionArguments: Array<Envelope.LinearFunctionParameters>
 )
 
 external fun getSeconds(

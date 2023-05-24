@@ -48,6 +48,7 @@ Envelope::Envelope(
           release(std::move(release)),
           loopSustain(loopSustain),
           currentIndex(0) {
+    // Min max of attack
     auto min_max = std::minmax_element(
             std::begin(*this->attack),
             std::end(*this->attack)
@@ -58,6 +59,8 @@ Envelope::Envelope(
     if (min_max.second != std::end(*this->attack)) {
         max = *min_max.second;
     }
+
+    // Min max of sustain
     auto sustain_min_max = std::minmax_element(
             std::begin(*this->sustain),
             std::end(*this->sustain)
@@ -68,6 +71,8 @@ Envelope::Envelope(
     if (sustain_min_max.second != std::end(*this->sustain)) {
         max = std::max(max, *sustain_min_max.second);
     }
+
+    // Min max of release
     auto release_min_max = std::minmax_element(
             std::begin(*this->release),
             std::end(*this->release)
@@ -103,10 +108,16 @@ double Envelope::nextDouble() {
         );
         value = (*release)[releaseIndex];
     }
+
+    // Update the index
     currentIndex++;
-    if (currentIndex >= attack->size() + sustain->size() && loopSustain && !releaseTriggered) {
-        currentIndex = static_cast<int>(attack->size());
-    } else if (currentIndex >= attack->size() + sustain->size() + release->size()) {
+    if (currentIndex >= attack->size() + sustain->size() &&
+        loopSustain && !releaseTriggered) {
+        // Loop sustain
+        currentIndex = static_cast<int>(attack->size() + 1);
+    } else if (currentIndex >=
+               attack->size() + sustain->size() + release->size()) {
+        // Loop whole envelope
         currentIndex = 0;
     }
 

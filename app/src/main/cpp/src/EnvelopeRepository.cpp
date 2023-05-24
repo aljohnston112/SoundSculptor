@@ -33,11 +33,11 @@ std::shared_ptr<Envelope> EnvelopeRepository::get_frequency_envelope(const int c
     return frequencyEnvelopes.at(column);
 }
 
-int32_t EnvelopeRepository::get_num_amplitude_envelopes() {
+size_t EnvelopeRepository::get_num_amplitude_envelopes() {
     return amplitudeEnvelopes.size();
 }
 
-int32_t EnvelopeRepository::get_num_frequency_envelopes() {
+size_t EnvelopeRepository::get_num_frequency_envelopes() {
     return frequencyEnvelopes.size();
 }
 

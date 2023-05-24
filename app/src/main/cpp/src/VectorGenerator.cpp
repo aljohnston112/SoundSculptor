@@ -1,37 +1,28 @@
 #include <cmath>
+#include <utility>
 #include "VectorGenerator.h"
 
-std::shared_ptr<std::vector<double>> generateSegment(
-        FunctionType function,
-        std::vector<double> args,
-        int64_t sampleRate
-) {
-    std::shared_ptr<std::vector<double>> segment;
-    double time;
-    int numSamples;
-    switch (function) {
-        case FunctionType::LINEAR:
-             time = args.at(2);
-            numSamples = static_cast<int>(std::round(static_cast<double>(sampleRate) * time));
-            segment = VectorGenerator::generateLinearSegment(
-                    args.at(0),
-                    args.at(1),
-                    numSamples
-            );
-            break;
-        case FunctionType::QUADRATIC:
-            // TODO
-            break;
-    }
-    return segment;
+int getNumSamples(double time, int64_t sampleRate) {
+    return static_cast<int>(
+            std::round(static_cast<double>(sampleRate) * time)
+    );
 }
 
+/**
+ * Generates a vector of points representing a constant function
+ * defined by the parameters.
+ * @param constant The constant
+ * @param numSamples The number of samples
+ * @return A shared pointer to the vector of points representing a constant function.
+ */
 std::shared_ptr<std::vector<double>> VectorGenerator::generateConstantSegment(
         double constant,
         double numSamples
 ) {
     if (numSamples < 0) {
-        throw std::invalid_argument("Invalid argument: numSamples must be non-negative");
+        throw std::invalid_argument(
+                "Invalid argument: numSamples must be non-negative"
+        );
     }
 
     std::shared_ptr<std::vector<double>> segment =
@@ -42,8 +33,22 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateConstantSegment(
     return segment;
 }
 
+std::shared_ptr<std::vector<double>> createLinearSegment(
+        std::vector<double> args,
+        int64_t sampleRate
+) {
+    double time = args.at(2);
+    int numSamples = getNumSamples(time, sampleRate);
+    return VectorGenerator::generateLinearSegment(
+            args.at(0),
+            args.at(1),
+            numSamples
+    );
+}
+
 /**
- * Generates a vector of points representing a linear function defined by the parameters.
+ * Generates a vector of points representing a linear function
+ * defined by the parameters.
  *
  * @param start The starting y-value.
  * @param end The ending y-value.
@@ -73,7 +78,8 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateLinearSegment(
 }
 
 /**
- * Generates a vector of points representing a quadratic function defined by the parameters.
+ * Generates a vector of points representing a quadratic function
+ * defined by the parameters.
  *
  * @param start The starting y-value.
  * @param vertex The vertex y-value.
@@ -105,10 +111,16 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateQuadraticSegment(
     }
 
     // Get the coefficients
-    double a = (((vertex - start) / numSamplesToVertex) - ((start - end) / numSamples)) /
+    double a = (
+                       ((vertex - start) / numSamplesToVertex) -
+                       ((start - end) / numSamples)
+               ) /
                (numSamples - numSamplesToVertex);
     double c = start;
-    double b = (end - c - (a * static_cast<double>(numSamples) * static_cast<double>(numSamples))) /
+    double b = (end - c - (
+            a * static_cast<double>(numSamples) *
+            static_cast<double>(numSamples)
+    )) /
                numSamples;
 
     // Generate the quadratic
@@ -123,5 +135,26 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateQuadraticSegment(
     return segment;
 }
 
-
-
+/**
+ * Generates a segment of a function with the given parameters.
+ * @param function The function to generate.
+ * @param args The args used to generate the function.
+ * @param sampleRate The sample rate.
+ * @return The generated segment.
+ */
+std::shared_ptr<std::vector<double>> generateSegment(
+        FunctionType function,
+        std::vector<double> args,
+        int64_t sampleRate
+) {
+    std::shared_ptr<std::vector<double>> segment;
+    switch (function) {
+        case FunctionType::LINEAR:
+            createLinearSegment(std::move(args), sampleRate);
+            break;
+        case FunctionType::QUADRATIC:
+            // TODO
+            break;
+    }
+    return segment;
+}

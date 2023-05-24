@@ -75,7 +75,7 @@ void SineWaveGenerator::setFrequencyEnvelope(std::shared_ptr<Envelope> envelope)
 
 /**
  * Reset the state of the SineWaveGenerator.
- * This will reset the phase and envelopes.
+ * This will reset the phase and the envelopes.
  */
 void SineWaveGenerator::resetState() {
     frequencyEnvelope->resetState();

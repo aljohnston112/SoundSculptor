@@ -17,8 +17,8 @@ public:
     std::shared_ptr<Envelope> get_amplitude_envelope(const int column);
     std::shared_ptr<Envelope> get_frequency_envelope(const int column);
 
-    int32_t get_num_amplitude_envelopes();
-    int32_t get_num_frequency_envelopes();
+    size_t get_num_amplitude_envelopes();
+    size_t get_num_frequency_envelopes();
     int64_t get_num_envelopes();
 
 private:

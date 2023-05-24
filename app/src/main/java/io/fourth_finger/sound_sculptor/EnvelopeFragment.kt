@@ -111,16 +111,23 @@ class EnvelopeFragment : Fragment() {
         functions[1] = envelopeData.sustainFunction
         functions[2] = envelopeData.releaseFunction
 
-        val functionArgs = Array(3) { DoubleArray(3) }
-        functionArgs[0][0] = envelopeData.attackStart
-        functionArgs[0][1] = envelopeData.attackEnd
-        functionArgs[0][2] = envelopeData.attackTime
-
-        functionArgs[1][0] = envelopeData.sustainEnd
-        functionArgs[1][1] = envelopeData.sustainTime
-
-        functionArgs[2][0] = envelopeData.releaseEnd
-        functionArgs[2][1] = envelopeData.releaseTime
+        val functionArgs = arrayOf(
+            Envelope.LinearFunctionParameters(
+                envelopeData.attackStart,
+                envelopeData.attackEnd,
+                envelopeData.attackTime
+            ),
+            Envelope.LinearFunctionParameters(
+                envelopeData.attackEnd,
+                envelopeData.sustainEnd,
+                envelopeData.sustainTime
+            ),
+            Envelope.LinearFunctionParameters(
+                envelopeData.sustainEnd,
+                envelopeData.releaseEnd,
+                envelopeData.releaseTime
+            )
+        )
 
         if(args.IsAmplitude) {
             setAmplitudeEnvelope(
