@@ -15,7 +15,7 @@ int getNumSamples(double time, int64_t sampleRate) {
  * @param numSamples The number of samples
  * @return A shared pointer to the vector of points representing a constant function.
  */
-std::shared_ptr<std::vector<double>> VectorGenerator::generateConstantSegment(
+std::shared_ptr<std::vector<double>> createConstantSegment(
         double constant,
         double numSamples
 ) {
@@ -39,9 +39,26 @@ std::shared_ptr<std::vector<double>> createLinearSegment(
 ) {
     double time = args.at(2);
     int numSamples = getNumSamples(time, sampleRate);
-    return VectorGenerator::generateLinearSegment(
+    return generateLinearSegment(
             args.at(0),
             args.at(1),
+            numSamples
+    );
+}
+
+std::shared_ptr<std::vector<double>> createQuadraticSegment(
+        std::vector<double> args,
+        int64_t sampleRate
+) {
+    double timeToVertex = args.at(3);
+    int numSamplesToVertex = getNumSamples(timeToVertex, sampleRate);
+    double time = args.at(4);
+    int numSamples = getNumSamples(time, sampleRate);
+    return generateQuadraticSegment(
+            args.at(0),
+            args.at(1),
+            args.at(2),
+            numSamplesToVertex,
             numSamples
     );
 }
@@ -55,7 +72,7 @@ std::shared_ptr<std::vector<double>> createLinearSegment(
  * @param numSamples The number of point between the start and the end inclusive.
  * @return A shared pointer to the vector of points representing the linear function.
  */
-std::shared_ptr<std::vector<double>> VectorGenerator::generateLinearSegment(
+std::shared_ptr<std::vector<double>> generateLinearSegment(
         double start,
         double end,
         int numSamples
@@ -88,49 +105,54 @@ std::shared_ptr<std::vector<double>> VectorGenerator::generateLinearSegment(
  * @param numSamples The total number of samples
  * @return A shared pointer to the vector of points representing the quadratic function.
  */
-std::shared_ptr<std::vector<double>> VectorGenerator::generateQuadraticSegment(
+std::shared_ptr<std::vector<double>> generateQuadraticSegment(
         double start,
         double vertex,
         double end,
         int numSamplesToVertex,
         int numSamples
 ) {
-    // TODO if both numSamplesToVertex and numSamples == 0
-    if (numSamplesToVertex < 0) {
-        throw std::invalid_argument(
-                "Invalid argument: numSamplesToVertex must be non-negative"
-        );
-    } else if (numSamples < 0) {
-        throw std::invalid_argument(
-                "Invalid argument: numSamples must be non-negative"
-        );
-    } else if (numSamplesToVertex == numSamples) {
-        throw std::invalid_argument(
-                "Invalid argument: numSamples must not be equal to numSamplesToVertex"
-        );
-    }
-
-    // Get the coefficients
-    double a = (
-                       ((vertex - start) / numSamplesToVertex) -
-                       ((start - end) / numSamples)
-               ) /
-               (numSamples - numSamplesToVertex);
-    double c = start;
-    double b = (end - c - (
-            a * static_cast<double>(numSamples) *
-            static_cast<double>(numSamples)
-    )) /
-               numSamples;
-
-    // Generate the quadratic
     std::shared_ptr<std::vector<double>> segment =
             std::make_shared<std::vector<double>>(numSamples);
-    double stepSize = 1.0 / (numSamples - 1);
-    for (int i = 0; i < numSamples; ++i) {
-        double x = i * stepSize;
-        double y = (a * x * x) + (b * x) + c;
-        (*segment)[i] = y;
+    if (!(numSamplesToVertex == 0 && numSamples == 0)) {
+        if (numSamplesToVertex < 0) {
+            throw std::invalid_argument(
+                    "Invalid argument: numSamplesToVertex must be non-negative"
+            );
+        } else if (numSamples < 0) {
+            throw std::invalid_argument(
+                    "Invalid argument: numSamples must be non-negative"
+            );
+        } else if (numSamplesToVertex == numSamples) {
+            throw std::invalid_argument(
+                    "Invalid argument: numSamples must not be equal to numSamplesToVertex"
+            );
+        } else if (numSamplesToVertex > numSamples) {
+            throw std::invalid_argument(
+                    "Invalid argument: numSamples must not be less than numSamplesToVertex"
+            );
+        }
+
+        // Get the coefficients
+        double a = (
+                           ((vertex - start) / numSamplesToVertex) -
+                           ((start - end) / numSamples)
+                   ) /
+                   (numSamples - numSamplesToVertex);
+        double c = start;
+        double b = (
+                           end - c - (
+                                   a * static_cast<double>(numSamples) *
+                                   static_cast<double>(numSamples)
+                           )) / numSamples;
+
+        // Generate the quadratic
+        double stepSize = 1.0 / (numSamples - 1);
+        for (int i = 0; i < numSamples; ++i) {
+            double x = i * stepSize;
+            double y = (a * x * x) + (b * x) + c;
+            (*segment)[i] = y;
+        }
     }
     return segment;
 }
@@ -153,7 +175,6 @@ std::shared_ptr<std::vector<double>> generateSegment(
             createLinearSegment(std::move(args), sampleRate);
             break;
         case FunctionType::QUADRATIC:
-            // TODO
             break;
     }
     return segment;

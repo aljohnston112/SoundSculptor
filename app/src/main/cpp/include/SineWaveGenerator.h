@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "AudioGenerator.h"
+#include "ASREnvelope.h"
 #include "Envelope.h"
 
 /**
@@ -13,7 +14,7 @@
  * The SineWaveGenerator class is a derived class of AudioGenerator that
  * specializes in generating sine waveforms.
  * It takes an AudioConfig object for audio configuration,
- * and Envelope objects for frequency and amplitude modulation.
+ * and ASREnvelope objects for frequency and amplitude modulation.
  * The generateSamples() method generates samples based on
  * the provided envelopes and writes them to the output buffer.
  * The resetState() method resets the state of the generator to
@@ -45,12 +46,6 @@ public:
     bool generateSamples(float *outputBuffer, int32_t numFrames) override;
 
     /**
-     * Reset the state of the SineWaveGenerator. This will reset the phase and envelopes.
-     */
-    void resetState() override;
-
-
-    /**
      * Set the amplitude envelope for the SineWaveGenerator.
      *
      * @param envelope The amplitude envelope to set.
@@ -64,10 +59,17 @@ public:
      */
     void setFrequencyEnvelope(std::shared_ptr<Envelope> envelope);
 
+
     /**
-     * Trigger the release phase of the envelopes in the SineWaveGenerator.
+     * Reset the state of the SineWaveGenerator. This will reset the phase and envelopes.
      */
-    void triggerRelease();
+    void resetState() override;
+
+//    /**
+//     * Trigger the release phase of the envelopes in the SineWaveGenerator.
+//     */
+//    void triggerRelease();
+
 
 private:
     const int channelCount;

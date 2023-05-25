@@ -3,7 +3,7 @@
 
 #include "/oboe/Oboe.h"
 #include <cmath>
-#include "../include/Envelope.h"
+#include "../include/ASREnvelope.h"
 #include "../include/SineWaveGenerator.h"
 #include "../include/VectorGenerator.h"
 

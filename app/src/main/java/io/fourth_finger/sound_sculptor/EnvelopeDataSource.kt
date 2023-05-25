@@ -1,16 +1,13 @@
 package io.fourth_finger.sound_sculptor
 
 import android.content.Context
-import io.fourth_finger.sound_sculptor.FileUtil.Companion.delete
-import io.fourth_finger.sound_sculptor.FileUtil.Companion.load
 import io.fourth_finger.sound_sculptor.FileUtil.Companion.loadList
-import io.fourth_finger.sound_sculptor.FileUtil.Companion.save
 import io.fourth_finger.sound_sculptor.FileUtil.Companion.saveList
 import java.io.Serializable
 
 
 /**
- * Parameters for creating an Envelope.
+ * Parameters for creating an ASREnvelope.
  */
 data class EnvelopeData(
     val attackFunction: Envelope.FunctionType,

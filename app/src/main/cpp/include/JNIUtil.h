@@ -2,7 +2,7 @@
 #define SOUNDSCULPTOR_JNIUTIL_H
 
 #include <jni.h>
-#include "Envelope.h"
+#include "ASREnvelope.h"
 
 std::vector<FunctionType> convertToFunctionTypeVector(
         JNIEnv *env,

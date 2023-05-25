@@ -2,7 +2,7 @@
 #include <android/native_window_jni.h>
 
 #include "AudioPlayer.h"
-#include "Envelope.h"
+#include "ASREnvelope.h"
 #include "EnvelopeRepository.h"
 #include "JNIUtil.h"
 
@@ -84,10 +84,10 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getSeconds(
 ) {
     int enumValue = getEnumValue(env, envelopeTypeEnum);
     int64_t size;
-    if (enumValue == Envelope::EnvelopeType::AMPLITUDE) {
+    if (enumValue == ASREnvelope::EnvelopeType::AMPLITUDE) {
         size = envelopeDataSource->amplitude_envelope_size(column);
     } else {
-        // enumValue == Envelope::EnvelopeType::FREQUENCY
+        // enumValue == ASREnvelope::EnvelopeType::FREQUENCY
         size = envelopeDataSource->frequency_envelope_size(column);
     }
     return (static_cast<double>(size) / kSampleRate);
@@ -122,11 +122,11 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
 
     // Get the envelope
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
-    std::shared_ptr<Envelope> envelope;
-    if (envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
+    std::shared_ptr<ASREnvelope> envelope;
+    if (envelopeType == ASREnvelope::EnvelopeType::AMPLITUDE) {
         envelope = envelopeDataSource->get_amplitude_envelope(column);
     } else {
-        // envelopeType == Envelope::EnvelopeType::FREQUENCY
+        // envelopeType == ASREnvelope::EnvelopeType::FREQUENCY
         envelope = envelopeDataSource->get_frequency_envelope(column);
     }
 
@@ -193,10 +193,10 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_isValidPosition(
 ) {
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
     bool isValid;
-    if (envelopeType == Envelope::EnvelopeType::AMPLITUDE) {
+    if (envelopeType == ASREnvelope::EnvelopeType::AMPLITUDE) {
         isValid = column < envelopeDataSource->get_num_amplitude_envelopes();
     } else {
-        // envelopeType == Envelope::EnvelopeType::FREQUENCY
+        // envelopeType == ASREnvelope::EnvelopeType::FREQUENCY
         isValid = column < envelopeDataSource->get_num_frequency_envelopes();
     }
 
@@ -215,7 +215,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_isValidPosition(
  * @param sampleRate The sample rate.
  * @return A shared pointer to the created envelope.
  */
-std::shared_ptr<Envelope> make_envelope(
+std::shared_ptr<ASREnvelope> make_envelope(
         JNIEnv *env,
         jobjectArray functionEnumArray,
         jobjectArray functionArgumentsArray,
@@ -251,7 +251,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setFrequencyEnvelope(
         jobjectArray functionEnumArray,
         jobjectArray functionArguments
 ) {
-    std::shared_ptr<Envelope> frequencyEnvelope = make_envelope(
+    std::shared_ptr<ASREnvelope> frequencyEnvelope = make_envelope(
             env,
             functionEnumArray,
             functionArguments,
@@ -280,7 +280,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setAmplitudeEnvelope(
         jobjectArray functionArguments
 ) {
 
-    std::shared_ptr<Envelope> amplitudeEnvelope = make_envelope(
+    std::shared_ptr<ASREnvelope> amplitudeEnvelope = make_envelope(
             env,
             functionEnumArray,
             functionArguments,

@@ -2,7 +2,7 @@
 #include <utility>
 #include <vector>
 #include "../include/JNIUtil.h"
-#include "Envelope.h"
+#include "ASREnvelope.h"
 
 /**
  * Converts an array of Java FunctionTypes to C++ FunctionTypes

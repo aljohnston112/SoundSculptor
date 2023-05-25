@@ -1,18 +1,18 @@
 #include "../include/EnvelopeRepository.h"
 
 EnvelopeRepository::EnvelopeRepository() {
-    amplitudeEnvelopes = std::vector<std::shared_ptr<Envelope>>();
-    frequencyEnvelopes = std::vector<std::shared_ptr<Envelope>>();
+    amplitudeEnvelopes = std::vector<std::shared_ptr<ASREnvelope>>();
+    frequencyEnvelopes = std::vector<std::shared_ptr<ASREnvelope>>();
 }
 
 void EnvelopeRepository::push_back_amplitude_envelope(
-        const std::shared_ptr<Envelope> &envelope
+        const std::shared_ptr<ASREnvelope> &envelope
 ) {
     amplitudeEnvelopes.push_back(envelope);
 }
 
 void EnvelopeRepository::push_back_frequency_envelope(
-        const std::shared_ptr<Envelope> &envelope
+        const std::shared_ptr<ASREnvelope> &envelope
 ) {
     frequencyEnvelopes.push_back(envelope);
 }
@@ -25,11 +25,11 @@ int64_t EnvelopeRepository::frequency_envelope_size(const int column) {
     return frequencyEnvelopes.at(column)->size();
 }
 
-std::shared_ptr<Envelope> EnvelopeRepository::get_amplitude_envelope(const int column) {
+std::shared_ptr<ASREnvelope> EnvelopeRepository::get_amplitude_envelope(const int column) {
     return amplitudeEnvelopes.at(column);
 }
 
-std::shared_ptr<Envelope> EnvelopeRepository::get_frequency_envelope(const int column) {
+std::shared_ptr<ASREnvelope> EnvelopeRepository::get_frequency_envelope(const int column) {
     return frequencyEnvelopes.at(column);
 }
 

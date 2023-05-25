@@ -78,7 +78,6 @@ class EnvelopeFragment : Fragment() {
                 sustainFunction != null && sustainEnd != null && sustainTime != null &&
                 releaseFunction != null && releaseEnd != null && releaseTime != null
             ) {
-                // TODO: Process the retrieved data accordingly
                 val envelopeData = EnvelopeData(
                     getFunctionType(attackFunction),
                     attackStart,
@@ -105,7 +104,6 @@ class EnvelopeFragment : Fragment() {
     }
 
     private fun processEnvelopeData(envelopeData: EnvelopeData) {
-        // TODO Pass the envelope data directly
         val functions = Array(3){ Envelope.FunctionType.LINEAR }
         functions[0] = envelopeData.attackFunction
         functions[1] = envelopeData.sustainFunction

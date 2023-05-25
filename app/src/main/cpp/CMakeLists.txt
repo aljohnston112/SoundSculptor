@@ -23,9 +23,11 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         src/native-lib.cpp
         src/AudioPlayer.cpp
-        src/Envelope.cpp
+        src/ASREnvelope.cpp
         src/EnvelopeRepository.cpp
+        src/EnvelopeSegment.cpp
         src/JNIUtil.cpp
+        src/SegmentedEnvelope.cpp
         src/SineWaveGenerator.cpp
         src/VectorGenerator.cpp)
 

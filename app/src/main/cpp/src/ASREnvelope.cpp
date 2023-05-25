@@ -1,7 +1,7 @@
-#include "Envelope.h"
+#include "ASREnvelope.h"
 #include "VectorGenerator.h"
 
-std::shared_ptr<Envelope> make_envelope(
+std::shared_ptr<ASREnvelope> make_envelope(
         std::vector<FunctionType> functionTypes,
         std::vector<std::vector<double>> functionArguments,
         int64_t sampleRate
@@ -27,7 +27,7 @@ std::shared_ptr<Envelope> make_envelope(
             sampleRate
     );
 
-    return std::make_shared<Envelope>(
+    return std::make_shared<ASREnvelope>(
             attack,
             sustain,
             release,
@@ -35,9 +35,7 @@ std::shared_ptr<Envelope> make_envelope(
     );
 }
 
-}
-
-Envelope::Envelope(
+ASREnvelope::ASREnvelope(
         std::shared_ptr<std::vector<double>> attack,
         std::shared_ptr<std::vector<double>> sustain,
         std::shared_ptr<std::vector<double>> release,
@@ -86,9 +84,9 @@ Envelope::Envelope(
 }
 
 
-double Envelope::nextDouble() {
+double ASREnvelope::nextDouble() {
     double value;
-    // Envelope is not released, handle attack and sustain
+    // ASREnvelope is not released, handle attack and sustain
     if (currentIndex < attack->size()) {
         value = (*attack)[currentIndex];
     } else if ((currentIndex < attack->size() + sustain->size()) ||
@@ -101,7 +99,7 @@ double Envelope::nextDouble() {
     } else if (loopSustain && !releaseTriggered) {
         value = (*attack)[attack->size() - 1];
     } else {
-        // Envelope is released, handle release
+        // ASREnvelope is released, handle release
         releaseTriggered = true;
         int releaseIndex = static_cast<int>(
                 currentIndex - attack->size() - sustain->size()
@@ -124,20 +122,20 @@ double Envelope::nextDouble() {
     return value;
 }
 
-void Envelope::triggerRelease() {
+void ASREnvelope::triggerRelease() {
     releaseTriggered = true;
 }
 
-void Envelope::resetState() {
+void ASREnvelope::resetState() {
     currentIndex = 0;
     releaseTriggered = false;
 }
 
-bool Envelope::finished() const {
+bool ASREnvelope::finished() const {
     return releaseTriggered && currentIndex == 0;
 }
 
-double Envelope::operator[](int index) const {
+double ASREnvelope::operator[](int index) const {
     if (index < attack->size()) {
         return (*attack)[index];
     } else if (index < attack->size() + sustain->size()) {

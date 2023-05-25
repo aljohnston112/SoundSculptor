@@ -32,10 +32,8 @@ bool SineWaveGenerator::generateSamples(float *outputBuffer, int32_t numFrames) 
 
     int i = 0;
     while (i < numFrames && !done) {
-        frequency = frequencyEnvelope->nextDouble();
-        amplitude = amplitudeEnvelope->nextDouble();
-        done = frequencyEnvelope->finished() || amplitudeEnvelope->finished();
-
+        done = frequencyEnvelope->nextDouble(&frequency);
+        done = done ||  amplitudeEnvelope->nextDouble(&amplitude);
 
         // Update phase
         const double phaseIncrement =
@@ -83,12 +81,15 @@ void SineWaveGenerator::resetState() {
     currentPhase = 0.0;
 }
 
-/**
- * Trigger the release phase of the frequency and amplitude envelopes.
- */
-void SineWaveGenerator::triggerRelease(){
-    frequencyEnvelope->triggerRelease();
-    amplitudeEnvelope->triggerRelease();
-}
+
+
+// TODO perhaps this will be part of another class
+///**
+// * Trigger the release phase of the frequency and amplitude envelopes.
+// */
+//void SineWaveGenerator::triggerRelease(){
+//    frequencyEnvelope->triggerRelease();
+//    amplitudeEnvelope->triggerRelease();
+//}
 
 
