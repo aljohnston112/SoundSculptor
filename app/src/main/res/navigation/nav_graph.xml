@@ -31,5 +31,19 @@
         android:id="@+id/mainFragment"
         android:name="io.fourth_finger.sound_sculptor.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_envelopeSegmentFragment"
+            app:destination="@id/envelopeSegmentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/envelopeSegmentFragment"
+        android:name="io.fourth_finger.sound_sculptor.EnvelopeSegmentFragment"
+        android:label="fragment_envelope_segment"
+        tools:layout="@layout/fragment_envelope_segment" >
+        <argument
+            android:name="isAmplitude"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
 </navigation>

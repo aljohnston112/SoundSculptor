@@ -4,22 +4,18 @@
 #include <vector>
 
 #include "VectorGenerator.h"
+#include "Envelope.h"
 
 class ASREnvelope;
 
-std::shared_ptr<ASREnvelope> make_envelope(
-        std::vector<FunctionType> functions,
+std::shared_ptr<ASREnvelope> make_asr_envelope(
+        std::vector<FunctionType> functionTypes,
         std::vector<std::vector<double>> functionArguments,
         int64_t sampleRate
 );
 
-class ASREnvelope {
+class ASREnvelope: public Envelope {
 public:
-
-    enum EnvelopeType {
-        AMPLITUDE = 0,
-        FREQUENCY = 1
-    };
 
     /**
      * @brief Constructs an ASREnvelope instance.
@@ -35,12 +31,7 @@ public:
                 bool loopSustain
     );
 
-/**
-     * @brief Gets the current value of the envelope.
-     *
-     * @return The current value of the envelope.
-     */
-    double nextDouble();
+    bool nextDouble(double *d) override;
 
     /**
      * @brief Indicates that the envelope should transition to the release phase.
@@ -51,17 +42,15 @@ public:
      * @brief Resets the state of the envelope.
      *        This is typically used to reset the envelope for a new note or sound event.
      */
-    void resetState();
+    void resetState() override;
 
-    bool finished() const;
+    double operator[](size_t index) const override;
 
-    double operator[](int index) const;
+    double getMin() override { return min; }
 
-    double getMin(){ return min; }
+    double getMax() override { return max; }
 
-    double getMax(){ return max; }
-
-    int size(){ return attack->size() + sustain->size() + release->size(); }
+    size_t size() override { return attack->size() + sustain->size() + release->size(); }
 
 private:
     std::shared_ptr<std::vector<double>> attack;
@@ -73,6 +62,9 @@ private:
 
     double min;
     double max;
+
+    double nextDouble();
+
 };
 
 #endif // SOUNDSCULPTOR_ASRENVELOPE_H

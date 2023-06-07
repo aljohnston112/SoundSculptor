@@ -172,9 +172,10 @@ std::shared_ptr<std::vector<double>> generateSegment(
     std::shared_ptr<std::vector<double>> segment;
     switch (function) {
         case FunctionType::LINEAR:
-            createLinearSegment(std::move(args), sampleRate);
+            segment = createLinearSegment(std::move(args), sampleRate);
             break;
         case FunctionType::QUADRATIC:
+            segment = createQuadraticSegment(std::move(args), sampleRate);
             break;
     }
     return segment;

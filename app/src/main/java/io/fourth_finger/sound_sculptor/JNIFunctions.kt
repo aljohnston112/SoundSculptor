@@ -2,14 +2,24 @@ package io.fourth_finger.sound_sculptor
 
 import java.nio.Buffer
 
-external fun setAmplitudeEnvelope(
+external fun pushBackAmplitudeEnvelope(
     functionEnumArray: Array<Envelope.FunctionType>,
     functionArguments: Array<Envelope.LinearFunctionParameters>
 )
 
-external fun setFrequencyEnvelope(
+external fun pushBackFrequencyEnvelope(
     functionEnumArray: Array<Envelope.FunctionType>,
     functionArguments: Array<Envelope.LinearFunctionParameters>
+)
+
+external fun setAmplitudeEnvelope(
+    functionEnumArray: Array<Envelope.FunctionType>,
+    functionArguments: Array<DoubleArray>
+)
+
+external fun setFrequencyEnvelope(
+    functionEnumArray: Array<Envelope.FunctionType>,
+    functionArguments: Array<DoubleArray>
 )
 
 external fun getSeconds(
@@ -29,7 +39,13 @@ external fun isValidPosition(
     col: Int
 ): Boolean
 
+external fun getEnvelopeType(pos: Int): Envelope.EnvelopeType
+
+external fun getColumnNumber(pos: Int): Int
+
 external fun init()
+
+external fun getNumAmplitudeEnvelopes(): Int
 
 external fun getNumEnvelopes(): Int
 

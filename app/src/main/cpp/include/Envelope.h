@@ -3,6 +3,11 @@
 
 #include <stddef.h>
 
+enum EnvelopeType {
+    AMPLITUDE = 0,
+    FREQUENCY = 1
+};
+
 class Envelope {
 public:
     virtual bool nextDouble(double* d) = 0;

@@ -104,23 +104,24 @@ class EnvelopeFragment : Fragment() {
     }
 
     private fun processEnvelopeData(envelopeData: EnvelopeData) {
-        val functions = Array(3){ Envelope.FunctionType.LINEAR }
-        functions[0] = envelopeData.attackFunction
-        functions[1] = envelopeData.sustainFunction
-        functions[2] = envelopeData.releaseFunction
+        val functions = arrayOf(
+            envelopeData.attackFunction,
+            envelopeData.sustainFunction,
+            envelopeData.releaseFunction
+        )
 
         val functionArgs = arrayOf(
-            Envelope.LinearFunctionParameters(
+            doubleArrayOf(
                 envelopeData.attackStart,
                 envelopeData.attackEnd,
                 envelopeData.attackTime
             ),
-            Envelope.LinearFunctionParameters(
+            doubleArrayOf(
                 envelopeData.attackEnd,
                 envelopeData.sustainEnd,
                 envelopeData.sustainTime
             ),
-            Envelope.LinearFunctionParameters(
+            doubleArrayOf(
                 envelopeData.sustainEnd,
                 envelopeData.releaseEnd,
                 envelopeData.releaseTime

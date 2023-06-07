@@ -1,7 +1,7 @@
 #include <exception>
 #include <utility>
 #include <vector>
-#include "../include/JNIUtil.h"
+#include "JNIUtil.h"
 #include "ASREnvelope.h"
 
 /**
@@ -41,15 +41,15 @@ std::vector<std::vector<double>> convertTo2DVector(
     for (int i = 0; i < arrayLength; ++i) {
         auto nestedJArray =
                 env->GetObjectArrayElement(jArray, i);
-        bool isDoubleArray = env->IsInstanceOf(
-                nestedJArray,
-                env->FindClass("[D")
-        );
-        if (!isDoubleArray) {
-            throw std::invalid_argument(
-                    "jobjectArray must be a 2D double array"
-            );
-        }
+//        bool isDoubleArray = env->IsInstanceOf(
+//                nestedJArray,
+//                env->FindClass("[D")
+//        );
+//        if (!isDoubleArray) {
+//            throw std::invalid_argument(
+//                    "jobjectArray must be a 2D double array"
+//            );
+//        }
         jobjects.push_back(convertToVector(
                 env,
                 static_cast<jdoubleArray>(nestedJArray)

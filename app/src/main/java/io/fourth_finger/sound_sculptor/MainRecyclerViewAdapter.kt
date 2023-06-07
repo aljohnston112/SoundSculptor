@@ -8,34 +8,54 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * Used to display one envelope graph.
  */
-class MainRecyclerViewAdapter :
-    RecyclerView.Adapter<MainRecyclerViewAdapter.ViewHolderFunctionView>() {
+class MainRecyclerViewAdapter(private val addNewCallback: (Envelope.EnvelopeType) -> Unit) :
+    RecyclerView.Adapter<MainRecyclerViewAdapter.MainViewHolder>() {
 
-    private val numRows = Envelope.EnvelopeType.values().size
+    private enum class ViewHolderType(val value: Int) {
+        AMPLITUDE(0),
+        FREQUENCY(1),
+        ADD_NEW(2)
+    }
+
+    private val numRows = 2
 
     override fun getItemViewType(position: Int): Int {
-        return getEnvelopeType(position).value
+        return getFunctionViewType(position).value
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ViewHolderFunctionView {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(
-                R.layout.main_recycler_view_view_holder,
-                parent,
-                false
-            )
-
-
-        return when (Envelope.EnvelopeType.values().first { it.value == viewType }) {
-            Envelope.EnvelopeType.AMPLITUDE -> {
+    ): MainViewHolder {
+        return when (ViewHolderType.values().firstOrNull { it.value == viewType }) {
+            ViewHolderType.AMPLITUDE -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(
+                        R.layout.main_recycler_view_view_holder,
+                        parent,
+                        false
+                    )
                 ViewHolderAmplitude(view)
             }
 
-            else -> {
+            ViewHolderType.FREQUENCY -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(
+                        R.layout.main_recycler_view_view_holder,
+                        parent,
+                        false
+                    )
                 ViewHolderFrequency(view)
+            }
+
+            else -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(
+                        R.layout.main_recycler_view_view_holder_add,
+                        parent,
+                        false
+                    )
+                ViewHolderAdd(view)
             }
         }
     }
@@ -44,27 +64,52 @@ class MainRecyclerViewAdapter :
         return getNumEnvelopes() + 2
     }
 
-    override fun onBindViewHolder(holder: ViewHolderFunctionView, position: Int) {
-        val envelopeType = getEnvelopeType(position)
-        val column = position.floorDiv(numRows)
-        holder.functionView.update(envelopeType, column)
+    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+        val functionViewType = getFunctionViewType(position)
+        val column = getColumnNumber(position)
+        if(holder is ViewHolderFunctionView) {
+            val envelopeType = when(functionViewType){
+                ViewHolderType.AMPLITUDE -> Envelope.EnvelopeType.AMPLITUDE
+                else -> Envelope.EnvelopeType.FREQUENCY
+            }
+            holder.functionView.update(envelopeType, column)
+        } else if(holder is ViewHolderAdd){
+            holder.addFunctionView.setOnClickListener {
+                addNewCallback(getEnvelopeType(position))
+            }
+        }
     }
 
-    private fun getEnvelopeType(position: Int): Envelope.EnvelopeType {
-        return when (position % numRows) {
-            0 -> {
-                Envelope.EnvelopeType.AMPLITUDE
+    private fun getFunctionViewType(position: Int): ViewHolderType {
+        return if(position >= getNumEnvelopes() || position == getFirstRowItemCount() - 1){
+            ViewHolderType.ADD_NEW
+        } else {
+            when (getEnvelopeType(position)) {
+                Envelope.EnvelopeType.AMPLITUDE -> {
+                    ViewHolderType.AMPLITUDE
+                }
+                else -> {
+                    ViewHolderType.FREQUENCY
+                }
             }
+        }
+    }
 
-            else -> {
-                Envelope.EnvelopeType.FREQUENCY
-            }
+    fun getFirstRowItemCount(): Int {
+        return getNumAmplitudeEnvelopes() + 1
+    }
+
+    class ViewHolderAdd(view: View) : MainViewHolder(view){
+        val addFunctionView: AddFunctionView
+
+        init {
+            addFunctionView = view.findViewById(R.id.function_view)
         }
     }
 
     class ViewHolderFrequency(view: View) : ViewHolderFunctionView(view)
     class ViewHolderAmplitude(view: View) : ViewHolderFunctionView(view)
-    open class ViewHolderFunctionView(view: View) : RecyclerView.ViewHolder(view) {
+    open class ViewHolderFunctionView(view: View) : MainViewHolder(view) {
         val functionView: FunctionView
 
         init {
@@ -72,5 +117,7 @@ class MainRecyclerViewAdapter :
         }
 
     }
+
+    open class MainViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
 }

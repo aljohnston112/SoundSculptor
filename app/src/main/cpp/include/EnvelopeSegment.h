@@ -3,8 +3,17 @@
 
 #include <vector>
 #include "Envelope.h"
+#include "VectorGenerator.h"
 
-class EnvelopeSegment: Envelope {
+class EnvelopeSegment;
+
+std::shared_ptr<EnvelopeSegment> make_envelope_segment(
+        FunctionType functionType,
+        std::vector<double> functionArgument,
+        int64_t sampleRate
+);
+
+class EnvelopeSegment: public Envelope {
 public:
     EnvelopeSegment(std::shared_ptr<std::vector<double>> segment);
     bool nextDouble(double* d) override;

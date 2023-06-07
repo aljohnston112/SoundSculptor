@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
-import android.view.View
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -22,9 +21,7 @@ import kotlin.properties.Delegates
 class FunctionView(
     context: Context,
     attributeSet: AttributeSet
-) : View(context, attributeSet) {
-
-    // TODO split this into two View classes.
+) : MainView(context, attributeSet) {
 
     private var envelopeType: Envelope.EnvelopeType by Delegates.notNull()
     private var col: Int by Delegates.notNull()
@@ -44,7 +41,6 @@ class FunctionView(
         linePaint.color = context.getColor(R.color.purple_200)
         linePaint.strokeWidth = 8f
 
-        val borderStrokeWidth = 4
         borderPaint.strokeWidth = borderStrokeWidth.toFloat()
         borderPaint.color = Color.BLACK
 
@@ -105,8 +101,6 @@ class FunctionView(
                 directFloatBuffer[0],
                 directFloatBuffer[directFloatBuffer.capacity() - 1]
             )
-        } else if (!hasValidPosition()) {
-            drawPlus(canvas)
         }
         drawBorder(canvas)
     }
@@ -138,51 +132,6 @@ class FunctionView(
         )
     }
 
-    private fun drawBorder(canvas: Canvas) {
-//        if (isThisSelected) {
-//            borderStrokeWidth *= 4
-//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
-//        }
-
-        //Right
-        canvas.drawLine(
-            width.toFloat(),
-            0f,
-            width.toFloat(),
-            height.toFloat(),
-            borderPaint
-        )
-        //Left
-        canvas.drawLine(0f, height.toFloat(), 0f, 0f, borderPaint)
-
-        // TODO why?
-        // Bottom
-//        if (isAmplitude) {
-//            borderColor.strokeWidth = (borderStrokeWidth / 2.0).toFloat()
-//        }
-        canvas.drawLine(
-            width.toFloat(),
-            height.toFloat(),
-            0f,
-            height.toFloat(),
-            borderPaint
-        )
-
-        // TODO why?
-        //Top
-//        if (!isAmplitude) {
-//            borderColor.strokeWidth = (borderStrokeWidth / 2.0).toFloat()
-//        } else {
-//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
-//        }
-
-        canvas.drawLine(0f, 0f, width.toFloat(), 0f, borderPaint)
-//        if (isThisSelected) {
-//            borderStrokeWidth /= 4
-//            borderColor.strokeWidth = borderStrokeWidth.toFloat()
-//        }
-    }
-
     private fun hasValidPosition(): Boolean {
         return isValidPosition(envelopeType, col)
     }
@@ -194,9 +143,11 @@ class FunctionView(
         if (hasValidPosition()) {
             // Sacrifice width if needed
             val desiredWidth = (measuredHeight * xToYRatio).roundToInt()
-            val width = if (desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&
+            var width = if (
+                desiredWidth > MeasureSpec.getSize(widthMeasureSpec) &&
                 MeasureSpec.getSize(widthMeasureSpec) != 0
             ) {
+                // TODO why does this return a value greater than desiredWidth?
                 resolveSizeAndState(
                     desiredWidth,
                     widthMeasureSpec,
@@ -206,6 +157,9 @@ class FunctionView(
                 desiredWidth
             }
 
+            if(width > desiredWidth){
+                width = desiredWidth
+            }
             setMeasuredDimension(width, measuredHeight)
         } else {
             setMeasuredDimension(measuredHeight, measuredHeight)
@@ -216,23 +170,6 @@ class FunctionView(
         super.onSizeChanged(w, h, oldw, oldh)
         update(envelopeType, col)
         invalidate()
-    }
-
-    private fun drawPlus(canvas: Canvas) {
-        canvas.drawRect(
-            (3.5 * width / 8.0).roundToInt().toFloat(),
-            (2.0 * width / 8.0).roundToInt().toFloat(),
-            (4.5 * width / 8.0).roundToInt().toFloat(),
-            (6.0 * width / 8.0).roundToInt().toFloat(),
-            linePaint
-        )
-        canvas.drawRect(
-            (2.0 * width / 8.0).roundToInt().toFloat(),
-            (3.5 * width / 8.0).roundToInt().toFloat(),
-            (6.0 * width / 8.0).roundToInt().toFloat(),
-            (4.5 * width / 8.0).roundToInt().toFloat(),
-            linePaint
-        )
     }
 
 }

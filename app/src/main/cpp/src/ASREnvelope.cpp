@@ -1,6 +1,40 @@
 #include "ASREnvelope.h"
 #include "VectorGenerator.h"
 
+std::shared_ptr<ASREnvelope> make_asr_envelope(
+        std::vector<FunctionType> functionTypes,
+        std::vector<std::vector<double>> functionArguments,
+        int64_t sampleRate
+) {
+    // Make attack segment
+    std::shared_ptr<std::vector<double>> attack = generateSegment(
+            functionTypes.at(0),
+            functionArguments.at(0),
+            sampleRate
+    );
+
+    // Make sustain segment
+    std::shared_ptr<std::vector<double>> sustain = generateSegment(
+            functionTypes.at(1),
+            functionArguments.at(1),
+            sampleRate
+    );
+
+    // Make release segment
+    std::shared_ptr<std::vector<double>> release = generateSegment(
+            functionTypes.at(2),
+            functionArguments.at(2),
+            sampleRate
+    );
+
+    return std::make_shared<ASREnvelope>(
+            attack,
+            sustain,
+            release,
+            true
+    );
+}
+
 std::shared_ptr<ASREnvelope> make_envelope(
         std::vector<FunctionType> functionTypes,
         std::vector<std::vector<double>> functionArguments,
@@ -83,6 +117,10 @@ ASREnvelope::ASREnvelope(
     }
 }
 
+bool ASREnvelope::nextDouble(double *d) {
+    (*d) = nextDouble();
+    return currentIndex == 0;
+}
 
 double ASREnvelope::nextDouble() {
     double value;
@@ -131,11 +169,7 @@ void ASREnvelope::resetState() {
     releaseTriggered = false;
 }
 
-bool ASREnvelope::finished() const {
-    return releaseTriggered && currentIndex == 0;
-}
-
-double ASREnvelope::operator[](int index) const {
+double ASREnvelope::operator[](size_t index) const {
     if (index < attack->size()) {
         return (*attack)[index];
     } else if (index < attack->size() + sustain->size()) {
