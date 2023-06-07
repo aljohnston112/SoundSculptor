@@ -61,7 +61,7 @@ class MainRecyclerViewAdapter(private val addNewCallback: (Envelope.EnvelopeType
     }
 
     override fun getItemCount(): Int {
-        return getNumEnvelopes() + 2
+        return  getNumEnvelopes() + 2
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
@@ -81,7 +81,7 @@ class MainRecyclerViewAdapter(private val addNewCallback: (Envelope.EnvelopeType
     }
 
     private fun getFunctionViewType(position: Int): ViewHolderType {
-        return if(position >= getNumEnvelopes() || position == getFirstRowItemCount() - 1){
+        return if(position > getNumEnvelopes() || position == getFirstRowItemCount() - 1){
             ViewHolderType.ADD_NEW
         } else {
             when (getEnvelopeType(position)) {

@@ -277,7 +277,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setFrequencyEnvelope(
             kSampleRate
     );
     sineWaveGenerator->setFrequencyEnvelope(frequencyEnvelope);
-    envelopeDataSource->push_back_amplitude_envelope(frequencyEnvelope);
+    envelopeDataSource->push_back_frequency_envelope(frequencyEnvelope);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -363,7 +363,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getColumnNumber(
     if (index <= envelopeDataSource->get_num_amplitude_envelopes()) {
         column = index;
     } else {
-        column = index - envelopeDataSource->get_num_amplitude_envelopes();
+        column = index - (envelopeDataSource->get_num_amplitude_envelopes() + 1);
     }
     return column;
 }

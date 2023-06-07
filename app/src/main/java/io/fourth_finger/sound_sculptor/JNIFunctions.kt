@@ -2,15 +2,15 @@ package io.fourth_finger.sound_sculptor
 
 import java.nio.Buffer
 
-external fun pushBackAmplitudeEnvelope(
-    functionEnumArray: Array<Envelope.FunctionType>,
-    functionArguments: Array<Envelope.LinearFunctionParameters>
-)
-
-external fun pushBackFrequencyEnvelope(
-    functionEnumArray: Array<Envelope.FunctionType>,
-    functionArguments: Array<Envelope.LinearFunctionParameters>
-)
+//external fun pushBackAmplitudeEnvelope(
+//    functionEnumArray: Array<Envelope.FunctionType>,
+//    functionArguments: Array<Envelope.LinearFunctionParameters>
+//)
+//
+//external fun pushBackFrequencyEnvelope(
+//    functionEnumArray: Array<Envelope.FunctionType>,
+//    functionArguments: Array<Envelope.LinearFunctionParameters>
+//)
 
 external fun setAmplitudeEnvelope(
     functionEnumArray: Array<Envelope.FunctionType>,
