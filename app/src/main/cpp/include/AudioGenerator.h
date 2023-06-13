@@ -1,6 +1,10 @@
 #ifndef SOUNDSCULPTOR_AUDIOGENERATOR_H
 #define SOUNDSCULPTOR_AUDIOGENERATOR_H
 
+#include <memory>
+
+#include "Envelope.h"
+
 /**
  * @class AudioGenerator
  * @brief Abstract base class for audio generation objects.
@@ -28,9 +32,13 @@ public:
      *
      * This method is responsible for resetting the state of the audio generator.
      * Derived classes must implement this method to reset any internal state variables
-     * such as phase and envelopes when there is a reset signal.
+     * such as phase and envelope_segments when there is a reset signal.
      */
     virtual void resetState() = 0;
+
+    virtual void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope) = 0;
+
+    virtual void setFrequencyEnvelope(std::shared_ptr<Envelope> envelope) = 0;
 
     virtual ~AudioGenerator() = default;
 

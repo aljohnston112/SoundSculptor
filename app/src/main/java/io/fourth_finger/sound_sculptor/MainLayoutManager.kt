@@ -73,12 +73,18 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
     }
 
     private fun getTotalWidth(): Int {
-        var totalWidth = 0
-        for(i in 0 until childCount){
+        var totalWidth1 = 0
+        for(i in 0 until firstRowItemCount){
             val view = getChildAt(i)
-            totalWidth += view?.width?:0
+            totalWidth1 += view?.width?:0
         }
-        return totalWidth
+
+        var totalWidth2 = 0
+        for(i in 0 until firstRowItemCount){
+            val view = getChildAt(i)
+            totalWidth2 += view?.width?:0
+        }
+        return maxOf(totalWidth1, totalWidth2)
     }
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
@@ -114,7 +120,7 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
                 rootView,
                 width + paddingLeft,
                 0,
-                paddingLeft + width + rootView.measuredWidth - paddingRight,
+                paddingLeft + width + rootView.measuredWidth,
                 rootView.measuredHeight
             )
             width += rootView.measuredWidth
@@ -139,7 +145,7 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
                 rootView,
                 width,
                 height,
-                paddingLeft + width + rootView.measuredWidth - paddingRight,
+                paddingLeft + width + rootView.measuredWidth,
                 height + rootView.measuredHeight
             )
             width += rootView.measuredWidth

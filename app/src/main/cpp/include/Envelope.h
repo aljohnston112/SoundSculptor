@@ -17,6 +17,8 @@ public:
     virtual double getMax() = 0;
     virtual size_t size() = 0;
     virtual void resetState() = 0;
+
+    virtual ~Envelope() = default;
 };
 
 

@@ -1,10 +1,10 @@
 #include "AudioPlayer.h"
 
 AudioPlayer::AudioPlayer(
-        std::shared_ptr<SineWaveGenerator> sineWaveGenerator,
+        std::shared_ptr<AudioGenerator> sineWaveGenerator,
         int channelCount,
         int sampleRate
-) : sineWaveGenerator(std::move(sineWaveGenerator)) {
+) : audioGenerator(std::move(sineWaveGenerator)) {
 
     // Configure the audio stream builder
     builder.setDirection(oboe::Direction::Output)
@@ -23,7 +23,7 @@ AudioPlayer::AudioPlayer(
 }
 
 void AudioPlayer::reset() {
-    sineWaveGenerator->resetState();
+    audioGenerator->resetState();
 }
 
 oboe::DataCallbackResult AudioPlayer::onAudioReady(
@@ -33,9 +33,9 @@ oboe::DataCallbackResult AudioPlayer::onAudioReady(
 ) {
 
     auto *outputBuffer = static_cast<float *>(audioData);
-    bool done = sineWaveGenerator->generateSamples(outputBuffer, numFrames);
+    bool done = audioGenerator->generateSamples(outputBuffer, numFrames);
     if(done){
-        sineWaveGenerator->resetState();
+        audioGenerator->resetState();
     }
     return done ? oboe::DataCallbackResult::Stop : oboe::DataCallbackResult::Continue;
 }

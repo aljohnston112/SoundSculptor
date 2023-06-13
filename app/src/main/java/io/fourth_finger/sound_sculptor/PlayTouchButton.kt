@@ -6,7 +6,7 @@ import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatButton
 
 /**
- * Used to play the current envelopes.
+ * Used to play the current envelope_segments.
  */
 class PlayTouchButton(
     context: Context,

@@ -1,7 +1,3 @@
-//
-// Created by aljoh on 5/25/2023.
-//
-
 #ifndef SOUNDSCULPTOR_SEGMENTEDENVELOPE_H
 #define SOUNDSCULPTOR_SEGMENTEDENVELOPE_H
 
@@ -9,10 +5,10 @@
 #include "Envelope.h"
 #include <vector>
 
-class SegmentedEnvelope : Envelope {
+class SegmentedEnvelope : public Envelope {
 public:
     SegmentedEnvelope(
-            const std::shared_ptr<Envelope> &envelope
+            const std::vector<std::shared_ptr<Envelope>> &envelopes
     );
 
     bool nextDouble(double *d) override;
@@ -29,14 +25,16 @@ public:
 
     size_t size() override {
         size_t size = 0;
-        for (auto &segment: *envelopes) {
+        for (auto &segment: envelopes) {
             size += segment->size();
         }
         return size;
     }
 
+    ~SegmentedEnvelope() override = default;
+
 private:
-    std::shared_ptr<std::vector<std::shared_ptr<Envelope>>> envelopes;
+    std::vector<std::shared_ptr<Envelope>> envelopes;
     uint64_t currentIndex;
     double min;
     double max;

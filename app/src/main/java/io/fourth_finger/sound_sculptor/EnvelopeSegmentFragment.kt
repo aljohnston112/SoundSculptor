@@ -6,14 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import io.fourth_finger.sound_sculptor.Envelope.Companion.getFunctionType
-import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeBinding
+import io.fourth_finger.sound_sculptor.EnvelopeArguments.Companion.getFunctionType
 import io.fourth_finger.sound_sculptor.databinding.FragmentEnvelopeSegmentBinding
 
 class EnvelopeSegmentFragment : Fragment() {
 
+    private val viewModel: EnvelopeSegmentViewModel by viewModels()
     private val args: EnvelopeSegmentFragmentArgs by navArgs()
 
     private var _binding: FragmentEnvelopeSegmentBinding? = null
@@ -21,7 +22,6 @@ class EnvelopeSegmentFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -54,30 +54,9 @@ class EnvelopeSegmentFragment : Fragment() {
             val start = binding.TextInputFieldStart.text?.toString()?.toDoubleOrNull()
             val end = binding.TextInputFieldEnd.text?.toString()?.toDoubleOrNull()
             val time = binding.TextInputFieldTime.text?.toString()?.toDoubleOrNull()
-
-            if (start != null && end != null && time != null && function != null) {
-                val functions = arrayOf(getFunctionType(function))
-                val functionArgs = arrayOf(
-                    doubleArrayOf(
-                        start,
-                        end,
-                        time
-                    )
-                )
-                if (args.isAmplitude) {
-                    setAmplitudeEnvelope(
-                        functions,
-                        functionArgs
-                    )
-                } else {
-                    setFrequencyEnvelope(
-                        functions,
-                        functionArgs
-                    )
-                }
-            }
-            findNavController().popBackStack()
+            viewModel.newEnvelopeData(args.isAmplitude, function, start, end, time)
         }
-    }
 
+        findNavController().popBackStack()
+    }
 }

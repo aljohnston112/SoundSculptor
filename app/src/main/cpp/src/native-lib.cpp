@@ -3,7 +3,7 @@
 
 #include "AudioPlayer.h"
 #include "ASREnvelope.h"
-#include "EnvelopeRepository.h"
+#include "EnvelopeSegmentCache.h"
 #include "JNIUtil.h"
 #include "EnvelopeSegment.h"
 
@@ -11,8 +11,10 @@ constexpr int kSampleRate = 44100;
 constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
-std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
-std::unique_ptr<EnvelopeRepository> envelopeDataSource;
+std::shared_ptr<EnvelopeSegmentCache> amplitudeEnvelopeSegmentCache;
+std::shared_ptr<EnvelopeSegmentCache> frequencyEnvelopeSegmentCache;
+
+std::shared_ptr<AudioGenerator> audioGenerator;
 
 extern "C" JNIEXPORT void JNICALL
 /**
@@ -22,9 +24,9 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_init(
         JNIEnv *env,
         jclass clazz
 ) {
-    envelopeDataSource = std::make_unique<EnvelopeRepository>();
-
-    sineWaveGenerator = std::make_shared<SineWaveGenerator>(
+    amplitudeEnvelopeSegmentCache = std::make_unique<EnvelopeSegmentCache>();
+    frequencyEnvelopeSegmentCache = std::make_unique<EnvelopeSegmentCache>();
+    audioGenerator = std::make_shared<SineWaveGenerator>(
             kChannelCount,
             kSampleRate
     );
@@ -39,21 +41,25 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_startPlaying(
         jclass clazz
 ) {
     audioPlayer = std::make_unique<AudioPlayer>(
-            sineWaveGenerator,
+            audioGenerator,
             kChannelCount,
             kSampleRate
     );
+    std::shared_ptr<Envelope> amplitudeEnvelope = amplitudeEnvelopeSegmentCache->get_envelope_segments_as_envelope();
+    std::shared_ptr<Envelope> frequencyEnvelope = frequencyEnvelopeSegmentCache->get_envelope_segments_as_envelope();
+    audioGenerator->setAmplitudeEnvelope(amplitudeEnvelope);
+    audioGenerator->setFrequencyEnvelope(frequencyEnvelope);
 }
 
 extern "C" JNIEXPORT void JNICALL
 /**
- * Triggers the release portion of the envelopes.
+ * Triggers the release portion of the envelope_segments.
  */
 Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_triggerRelease(
         JNIEnv *env,
         jclass clazz
 ) {
-    // sineWaveGenerator->triggerRelease();
+    // audioGenerator->triggerRelease();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -86,10 +92,10 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getSeconds(
     int enumValue = getEnumValue(env, envelopeTypeEnum);
     int64_t size;
     if (enumValue == EnvelopeType::AMPLITUDE) {
-        size = envelopeDataSource->amplitude_envelope_size(column);
+        size = amplitudeEnvelopeSegmentCache->size_of_combined_envelopes(column);
     } else {
         // enumValue == ASREnvelope::EnvelopeType::FREQUENCY
-        size = envelopeDataSource->frequency_envelope_size(column);
+        size = frequencyEnvelopeSegmentCache->size_of_combined_envelopes(column);
     }
     return (static_cast<double>(size) / kSampleRate);
 
@@ -125,10 +131,10 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
     std::shared_ptr<Envelope> envelope;
     if (envelopeType == EnvelopeType::AMPLITUDE) {
-        envelope = envelopeDataSource->get_amplitude_envelope(column);
+        envelope = amplitudeEnvelopeSegmentCache->get_envelope_segment(column);
     } else {
         // envelopeType == EnvelopeType::FREQUENCY
-        envelope = envelopeDataSource->get_frequency_envelope(column);
+        envelope = frequencyEnvelopeSegmentCache->get_envelope_segment(column);
     }
 
     // Fill the buffer with envelope data
@@ -166,24 +172,27 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
 
 extern "C" JNIEXPORT jint JNICALL
 /**
- * Gets the total number of envelopes.
+ * Gets the total number of envelope_segments.
  * This includes every type of envelope.
  *
- * @return The total number of envelopes.
+ * @return The total number of envelope_segments.
  */
 Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumEnvelopes(
         JNIEnv *env,
         jclass clazz
 ) {
-    return static_cast<jint>(envelopeDataSource->get_num_envelopes());
+    return static_cast<jint>(
+            amplitudeEnvelopeSegmentCache->get_num_envelope_segments() +
+                    frequencyEnvelopeSegmentCache->get_num_envelope_segments()
+            );
 }
 
 extern "C" JNIEXPORT jint JNICALL
 Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumAmplitudeEnvelopes(
         JNIEnv *env,
-jclass clazz
+        jclass clazz
 ) {
-return static_cast<jint>(envelopeDataSource->get_num_amplitude_envelopes());
+    return static_cast<jint>(amplitudeEnvelopeSegmentCache->get_num_envelope_segments());
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
@@ -203,10 +212,10 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_isValidPosition(
     int envelopeType = getEnumValue(env, envelopeTypeEnum);
     bool isValid;
     if (envelopeType == EnvelopeType::AMPLITUDE) {
-        isValid = column < envelopeDataSource->get_num_amplitude_envelopes();
+        isValid = column < amplitudeEnvelopeSegmentCache->get_num_envelope_segments();
     } else {
         // envelopeType == ASREnvelope::EnvelopeType::FREQUENCY
-        isValid = column < envelopeDataSource->get_num_frequency_envelopes();
+        isValid = column < frequencyEnvelopeSegmentCache->get_num_envelope_segments();
     }
 
     return isValid;
@@ -218,7 +227,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_isValidPosition(
  *
  * @param functionEnumArray The types of functions to use for the
  *                          attack, sustain and release portions of the
- *                          envelopes.
+ *                          envelope_segments.
  * @param functionArgumentsArray The arguments used to create the
  *                               functions for each portion of the envelope.
  * @param sampleRate The sample rate.
@@ -239,14 +248,14 @@ std::shared_ptr<Envelope> make_envelope(
             functionArgumentsArray
     );
     std::shared_ptr<Envelope> envelope;
-    if(functionTypes.size() == 3){
+    if (functionTypes.size() == 3) {
         envelope = make_asr_envelope(functionTypes, functionArguments, sampleRate);
-    } else if(functionTypes.size() == 1){
+    } else if (functionTypes.size() == 1) {
         envelope = make_envelope_segment(
                 functionTypes[0],
                 functionArguments[0],
                 sampleRate
-                );
+        );
     }
     return envelope;
 }
@@ -264,7 +273,7 @@ extern "C" JNIEXPORT void JNICALL
  *                          construct the corresponding function in the
  *                          functionArray.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setFrequencyEnvelope(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addFrequencyEnvelopeSegment(
         JNIEnv *env,
         jclass clazz,
         jobjectArray functionEnumArray,
@@ -276,8 +285,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setFrequencyEnvelope(
             functionArguments,
             kSampleRate
     );
-    sineWaveGenerator->setFrequencyEnvelope(frequencyEnvelope);
-    envelopeDataSource->push_back_frequency_envelope(frequencyEnvelope);
+    frequencyEnvelopeSegmentCache->push_back_envelope_segment(frequencyEnvelope);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -293,7 +301,7 @@ extern "C" JNIEXPORT void JNICALL
  *                          construct the corresponding function in the
  *                          functionArray.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setAmplitudeEnvelope(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addAmplitudeEnvelopeSegment(
         JNIEnv *env,
         jclass clazz,
         jobjectArray functionEnumArray,
@@ -306,8 +314,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_setAmplitudeEnvelope(
             functionArguments,
             kSampleRate
     );
-    sineWaveGenerator->setAmplitudeEnvelope(amplitudeEnvelope);
-    envelopeDataSource->push_back_amplitude_envelope(amplitudeEnvelope);
+    amplitudeEnvelopeSegmentCache->push_back_envelope_segment(amplitudeEnvelope);
 }
 
 extern "C"
@@ -318,8 +325,8 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getEnvelopeType(
         jint index
 ) {
     if (index >=
-        (envelopeDataSource->get_num_amplitude_envelopes() +
-         envelopeDataSource->get_num_frequency_envelopes()) + 2) {
+        (amplitudeEnvelopeSegmentCache->get_num_envelope_segments() +
+         frequencyEnvelopeSegmentCache->get_num_envelope_segments()) + 2) {
         throw std::invalid_argument("Index out of bounds");
     }
     jclass envelopeTypeClass = env->FindClass(
@@ -332,7 +339,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getEnvelopeType(
     auto envelopeTypeArray = (jobjectArray) env->CallStaticObjectMethod(envelopeTypeClass,
                                                                         valuesMethod);
     jobject envelopeTypeJNI;
-    if (index <= envelopeDataSource->get_num_amplitude_envelopes()) {
+    if (index <= amplitudeEnvelopeSegmentCache->get_num_envelope_segments()) {
         envelopeTypeJNI = env->GetObjectArrayElement(
                 envelopeTypeArray,
                 static_cast<int>(EnvelopeType::AMPLITUDE)
@@ -354,16 +361,16 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getColumnNumber(
         jint index
 ) {
     if (index >=
-        (envelopeDataSource->get_num_amplitude_envelopes() +
-         envelopeDataSource->get_num_frequency_envelopes()) + 2) {
+        (amplitudeEnvelopeSegmentCache->get_num_envelope_segments() +
+         frequencyEnvelopeSegmentCache->get_num_envelope_segments()) + 2) {
         throw std::invalid_argument("Index out of bounds");
     }
 
-    uint column;
-    if (index <= envelopeDataSource->get_num_amplitude_envelopes()) {
+    jint column;
+    if (index <= amplitudeEnvelopeSegmentCache->get_num_envelope_segments()) {
         column = index;
     } else {
-        column = index - (envelopeDataSource->get_num_amplitude_envelopes() + 1);
+        column = index - static_cast<jint>(amplitudeEnvelopeSegmentCache->get_num_envelope_segments() + 1);
     }
     return column;
 }

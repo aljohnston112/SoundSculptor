@@ -15,26 +15,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        )
+        setSupportActionBar(binding.toolbar)
         init()
-
-        val functionEnums = Array(3) { Envelope.FunctionType.LINEAR }
-        val functionArgsFrequency = arrayOf(
-            doubleArrayOf(200.0, 400.0, 1.0),
-            doubleArrayOf(400.0, 400.0, 0.0),
-            doubleArrayOf(400.0, 20.0, 1.0),
-        )
-        val functionArgsAmplitude = arrayOf(
-            doubleArrayOf(0.0, 1.0, 1.0),
-            doubleArrayOf(1.0, 1.0, 0.0),
-            doubleArrayOf(1.0, 0.0, 1.0),
-        )
-        init()
-
     }
 
     companion object {

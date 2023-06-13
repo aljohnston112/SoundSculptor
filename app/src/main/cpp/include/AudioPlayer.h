@@ -19,7 +19,7 @@ public:
      * Configures and opens the audio stream for playback.
      */
     AudioPlayer(
-            std::shared_ptr<SineWaveGenerator> sineWaveGenerator,
+            std::shared_ptr<AudioGenerator> sineWaveGenerator,
             int channelCount,
             int sampleRate
     );
@@ -49,7 +49,7 @@ public:
     ~AudioPlayer() override;
 
 private:
-    std::shared_ptr<SineWaveGenerator> sineWaveGenerator;
+    std::shared_ptr<AudioGenerator> audioGenerator;
     oboe::AudioStreamBuilder builder;
     std::shared_ptr<oboe::AudioStream> stream;
 };

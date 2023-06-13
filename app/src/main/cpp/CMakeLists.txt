@@ -24,7 +24,7 @@ add_library( # Sets the name of the library.
         src/native-lib.cpp
         src/AudioPlayer.cpp
         src/ASREnvelope.cpp
-        src/EnvelopeRepository.cpp
+        src/EnvelopeSegmentCache.cpp
         src/EnvelopeSegment.cpp
         src/JNIUtil.cpp
         src/SegmentedEnvelope.cpp

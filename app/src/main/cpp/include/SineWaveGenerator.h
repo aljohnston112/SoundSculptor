@@ -16,7 +16,7 @@
  * It takes an AudioConfig object for audio configuration,
  * and ASREnvelope objects for frequency and amplitude modulation.
  * The generateSamples() method generates samples based on
- * the provided envelopes and writes them to the output buffer.
+ * the provided envelope_segments and writes them to the output buffer.
  * The resetState() method resets the state of the generator to
  * help prevent artifacts such as clicks.
  */
@@ -50,23 +50,23 @@ public:
      *
      * @param envelope The amplitude envelope to set.
      */
-    void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope);
+    void setAmplitudeEnvelope(std::shared_ptr<Envelope> envelope) override;
 
     /**
      * Set the frequency envelope for the SineWaveGenerator.
      *
      * @param envelope The frequency envelope to set.
      */
-    void setFrequencyEnvelope(std::shared_ptr<Envelope> envelope);
+    void setFrequencyEnvelope(std::shared_ptr<Envelope> envelope) override;
 
 
     /**
-     * Reset the state of the SineWaveGenerator. This will reset the phase and envelopes.
+     * Reset the state of the SineWaveGenerator. This will reset the phase and envelope_segments.
      */
     void resetState() override;
 
 //    /**
-//     * Trigger the release phase of the envelopes in the SineWaveGenerator.
+//     * Trigger the release phase of the envelope_segments in the SineWaveGenerator.
 //     */
 //    void triggerRelease();
 

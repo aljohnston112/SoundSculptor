@@ -29,7 +29,7 @@
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="io.fourth_finger.sound_sculptor.MainFragment"
+        android:name="io.fourth_finger.sound_sculptor.EnvelopeFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action

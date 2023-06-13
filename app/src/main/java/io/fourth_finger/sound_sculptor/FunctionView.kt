@@ -6,25 +6,27 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.view.View
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 /**
  * A Surface view that draws graphs that represent the
- * envelopes on the NDK side.
- * [update] must be called before this view is drawn.
+ * envelope_segments on the NDK side.
+ * [updateMinMax] must be called before this view is drawn.
  */
 class FunctionView(
     context: Context,
     attributeSet: AttributeSet
-) : MainView(context, attributeSet) {
+) : MainView(context, attributeSet), MinMaxObserver {
 
     private var envelopeType: Envelope.EnvelopeType by Delegates.notNull()
-    private var col: Int by Delegates.notNull()
+    private var column: Int by Delegates.notNull()
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -37,9 +39,15 @@ class FunctionView(
     ).order(ByteOrder.nativeOrder()).asFloatBuffer()
     private val envelopePath = Path()
 
+    private lateinit var minMaxSubject: MinMaxSubject
+    private lateinit var minMax: MinMax
+
     init {
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
         linePaint.color = context.getColor(R.color.purple_200)
         linePaint.strokeWidth = 8f
+        linePaint.strokeCap = Paint.Cap.ROUND
 
         borderPaint.strokeWidth = borderStrokeWidth.toFloat()
         borderPaint.color = Color.BLACK
@@ -51,13 +59,20 @@ class FunctionView(
 
     private val xToYRatio: Double
         get() {
-            return getSeconds(envelopeType, col)
+            return getSeconds(envelopeType, column)
         }
 
-    // TODO this is a bad solution
-    fun update(envelopeType: Envelope.EnvelopeType, column: Int) {
+    // TODO is this a bad solution?
+    fun update(
+        envelopeType: Envelope.EnvelopeType,
+        column: Int,
+        minMaxSubject: MinMaxSubject?
+    ) {
         this.envelopeType = envelopeType
-        this.col = column
+        this.column = column
+        if (!::minMaxSubject.isInitialized && minMaxSubject != null){
+                this.minMaxSubject = minMaxSubject
+        }
         if (hasValidPosition() && width > 0) {
             directFloatBuffer = ByteBuffer.allocateDirect(
                 width * 4
@@ -69,14 +84,13 @@ class FunctionView(
                 column,
                 width
             )
-            var minY = minMax[0]
-            var maxY = minMax[1]
-
-            // Add room around constant
-            if (minY == maxY) {
-                minY += 1.0f
-                maxY += 1.0f
+            if(!::minMax.isInitialized) {
+                this.minMax = MinMax(minMax[0], minMax[1])
             }
+            this.minMaxSubject.setMinMax(this.minMax)
+
+            val minY = this.minMax.min
+            val maxY = this.minMax.max
 
             val yScale: Float = height / (maxY - minY)
             val firstValue = abs(
@@ -133,7 +147,7 @@ class FunctionView(
     }
 
     private fun hasValidPosition(): Boolean {
-        return isValidPosition(envelopeType, col)
+        return isValidPosition(envelopeType, column)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -157,7 +171,7 @@ class FunctionView(
                 desiredWidth
             }
 
-            if(width > desiredWidth){
+            if (width > desiredWidth) {
                 width = desiredWidth
             }
             setMeasuredDimension(width, measuredHeight)
@@ -168,8 +182,20 @@ class FunctionView(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        update(envelopeType, col)
+        update(envelopeType, column, null)
         invalidate()
+    }
+
+    private fun updateMinMax(minMax: MinMax) {
+        if(this.minMax != minMax){
+            this.minMax = minMax
+            update(envelopeType, column, null)
+            invalidate()
+        }
+    }
+
+    override fun update(minMax: MinMax) {
+        updateMinMax(minMax)
     }
 
 }

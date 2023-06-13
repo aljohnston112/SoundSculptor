@@ -27,6 +27,7 @@
     <string name="start">Start</string>
     <string name="end">End</string>
     <string name="time">Time(Seconds)</string>
+    <string name="save">Save</string>
 
 
 </resources>

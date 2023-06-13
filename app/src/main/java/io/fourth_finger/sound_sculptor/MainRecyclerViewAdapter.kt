@@ -61,33 +61,77 @@ class MainRecyclerViewAdapter(private val addNewCallback: (Envelope.EnvelopeType
     }
 
     override fun getItemCount(): Int {
-        return  getNumEnvelopes() + 2
+        return getNumEnvelopes() + 2
     }
 
+    private val amplitudeMinMaxSubject = MinMaxSubject(MinMax(Float.MAX_VALUE, Float.MIN_VALUE))
+    private val frequencyMinMaxSubject = MinMaxSubject(MinMax(Float.MAX_VALUE, Float.MIN_VALUE))
+
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        val functionViewType = getFunctionViewType(position)
-        val column = getColumnNumber(position)
-        if(holder is ViewHolderFunctionView) {
-            val envelopeType = when(functionViewType){
-                ViewHolderType.AMPLITUDE -> Envelope.EnvelopeType.AMPLITUDE
-                else -> Envelope.EnvelopeType.FREQUENCY
-            }
-            holder.functionView.update(envelopeType, column)
-        } else if(holder is ViewHolderAdd){
+        if (holder is ViewHolderAdd) {
             holder.addFunctionView.setOnClickListener {
                 addNewCallback(getEnvelopeType(position))
             }
         }
     }
 
+    override fun onViewAttachedToWindow(holder: MainViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        val position = holder.adapterPosition
+        val functionViewType = getFunctionViewType(position)
+        val column = getColumnNumber(position)
+        if (holder is ViewHolderFunctionView) {
+            val envelopeType = when (functionViewType) {
+                ViewHolderType.AMPLITUDE -> Envelope.EnvelopeType.AMPLITUDE
+                else -> Envelope.EnvelopeType.FREQUENCY
+            }
+            when (functionViewType) {
+                ViewHolderType.AMPLITUDE -> {
+                    holder.functionView.update(envelopeType, column, amplitudeMinMaxSubject)
+                    amplitudeMinMaxSubject.attach(holder.functionView)
+                }
+
+                else -> {
+                    holder.functionView.update(envelopeType, column, frequencyMinMaxSubject)
+                    frequencyMinMaxSubject.attach(holder.functionView)
+                }
+            }
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: MainViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        val position = holder.adapterPosition
+        val functionViewType = getFunctionViewType(position)
+        val column = getColumnNumber(position)
+        if (holder is ViewHolderFunctionView) {
+            val envelopeType = when (functionViewType) {
+                ViewHolderType.AMPLITUDE -> Envelope.EnvelopeType.AMPLITUDE
+                else -> Envelope.EnvelopeType.FREQUENCY
+            }
+            when (functionViewType) {
+                ViewHolderType.AMPLITUDE -> {
+                    amplitudeMinMaxSubject.detach(holder.functionView)
+                }
+
+                else -> {
+                    frequencyMinMaxSubject.detach(holder.functionView)
+                }
+            }
+        }
+    }
+
+
+
     private fun getFunctionViewType(position: Int): ViewHolderType {
-        return if(position > getNumEnvelopes() || position == getFirstRowItemCount() - 1){
+        return if (position > getNumEnvelopes() || position == getFirstRowItemCount() - 1) {
             ViewHolderType.ADD_NEW
         } else {
             when (getEnvelopeType(position)) {
                 Envelope.EnvelopeType.AMPLITUDE -> {
                     ViewHolderType.AMPLITUDE
                 }
+
                 else -> {
                     ViewHolderType.FREQUENCY
                 }
@@ -99,7 +143,7 @@ class MainRecyclerViewAdapter(private val addNewCallback: (Envelope.EnvelopeType
         return getNumAmplitudeEnvelopes() + 1
     }
 
-    class ViewHolderAdd(view: View) : MainViewHolder(view){
+    class ViewHolderAdd(view: View) : MainViewHolder(view) {
         val addFunctionView: AddFunctionView
 
         init {
