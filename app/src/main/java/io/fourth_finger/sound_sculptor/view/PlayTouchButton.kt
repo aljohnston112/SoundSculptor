@@ -1,12 +1,14 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.view
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatButton
+import io.fourth_finger.sound_sculptor.startPlaying
+import io.fourth_finger.sound_sculptor.triggerRelease
 
 /**
- * Used to play the current envelope_segments.
+ * Used to play the current envelope.
  */
 class PlayTouchButton(
     context: Context,

@@ -1,4 +1,4 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.data_class
 
 import java.io.Serializable
 
@@ -7,7 +7,8 @@ import java.io.Serializable
  */
 class Envelope(
     val name: String,
-    val envelopeSegmentArguments: List<EnvelopeArguments>
+    val amplitudeEnvelopeArguments: List<EnvelopeArguments>,
+    val frequencyEnvelopeArguments: List<EnvelopeArguments>
 ) : Serializable {
 
     /**

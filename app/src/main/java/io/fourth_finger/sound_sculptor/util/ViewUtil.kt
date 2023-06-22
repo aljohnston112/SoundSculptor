@@ -1,9 +1,13 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.util
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 
+/**
+ * Draws a border around a canvas.
+ * @param canvas The canvas to draw the border around.
+ */
 fun drawBorder(canvas: Canvas) {
 //        if (isThisSelected) {
 //            borderStrokeWidth *= 4

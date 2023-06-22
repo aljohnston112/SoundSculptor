@@ -1,4 +1,4 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
+import io.fourth_finger.sound_sculptor.R
 import io.fourth_finger.sound_sculptor.databinding.FragmentTitleBinding
 
+/**
+ * The title page of the app.
+ */
 class TitleFragment : Fragment(R.layout.fragment_title) {
 
     private var _binding: FragmentTitleBinding? = null
@@ -32,23 +36,11 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.buttonAddAmplitudeEnvelope.setOnClickListener {
-            view.findNavController().navigate(
-                TitleFragmentDirections.actionTitleFragmentToEnvelopeFragment()
-            )
-        }
-        binding.buttonAddFrequencyEnvelope.setOnClickListener {
-            view.findNavController().navigate(
-                TitleFragmentDirections.actionTitleFragmentToEnvelopeFragment(false)
-            )
-        }
-        binding.stopButton.setOnClickListener {
-            stopPlaying()
-        }
 
+        // Navigate to the list of envelopes
         binding.buttonMain.setOnClickListener{
             view.findNavController().navigate(
-                TitleFragmentDirections.actionTitleFragmentToMainFragment()
+                TitleFragmentDirections.actionTitleFragmentToEnvelopeListFragment()
             )
         }
     }

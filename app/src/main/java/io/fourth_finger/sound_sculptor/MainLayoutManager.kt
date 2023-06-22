@@ -7,22 +7,15 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Recycler
 import androidx.recyclerview.widget.RecyclerView.State
 
-
+/**
+ * For laying out an envelope with two rows of envelope segments.
+ * One row is for the amplitude envelope segments and
+ * the other is for the frequency envelope segments.
+ */
 class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
 
-    private var firstRowItemCount = 0
-
-    private var totalHeight = 0
-    private var totalWidth = 0
-
-    override fun onAdapterChanged(
-        oldAdapter: RecyclerView.Adapter<*>?,
-        newAdapter: RecyclerView.Adapter<*>?
-    ) {
-        super.onAdapterChanged(oldAdapter, newAdapter)
-        if (newAdapter is MainRecyclerViewAdapter) {
-            firstRowItemCount = newAdapter.getFirstRowItemCount()
-        }
+    override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
+        return RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT)
     }
 
     override fun canScrollHorizontally(): Boolean {
@@ -36,14 +29,14 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
     }
 
     override fun scrollHorizontallyBy(dx: Int, recycler: Recycler, state: State): Int {
-        totalWidth = getTotalWidth()
+        val totalWidth = getTotalWidth()
 
         var scroll = false
         var actualDx = 0
 
         if(dx > 0) {
             val lastViewRight = getChildAt(childCount - 1)?.let { getDecoratedRight(it) } ?: 0
-            val lastFirstRowViewRight = getChildAt(firstRowItemCount - 1)?.let { getDecoratedRight(it) } ?: 0
+            val lastFirstRowViewRight = getChildAt(getNumAmplitudeEnvelopeSegments())?.let { getDecoratedRight(it) } ?: 0
             if (lastViewRight >= width || lastFirstRowViewRight >= width) {
                 var maxScroll = totalWidth - totalDx - width
                 if (maxScroll < 0) {
@@ -74,39 +67,44 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
 
     private fun getTotalWidth(): Int {
         var totalWidth1 = 0
-        for(i in 0 until firstRowItemCount){
+        for(i in 0 until getFirstRowItemCount()){
             val view = getChildAt(i)
             totalWidth1 += view?.width?:0
         }
 
         var totalWidth2 = 0
-        for(i in 0 until firstRowItemCount){
+        for(i in 0 until getFirstRowItemCount()){
             val view = getChildAt(i)
             totalWidth2 += view?.width?:0
         }
         return maxOf(totalWidth1, totalWidth2)
     }
 
-    override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
-        return RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+    /**
+     * @return The number of views in the first row.
+     */
+    private fun getFirstRowItemCount(): Int {
+        return  getNumAmplitudeEnvelopeSegments() + 1
     }
-
 
     override fun onLayoutChildren(
         recycler: RecyclerView.Recycler,
-        state: RecyclerView.State
+        state: State
     ) {
         layout(recycler, state)
     }
 
+    /**
+     * Layouts the views.
+     */
     private fun layout(recycler: Recycler, state: State) {
         val heightUsed =  height / 2
-        var height = 0
-        var width = 0
+        var y = 0
+        var x = 0
         detachAndScrapAttachedViews(recycler)
 
         // First row
-        for (position in 0 until firstRowItemCount) {
+        for (position in 0 until getFirstRowItemCount()) {
 
             val rootView = recycler.getViewForPosition(position)
             addView(rootView)
@@ -118,20 +116,18 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
             measureChildWithMargins(rootView, 0, 0)
             layoutDecoratedWithMargins(
                 rootView,
-                width + paddingLeft,
+                x + paddingLeft,
                 0,
-                paddingLeft + width + rootView.measuredWidth,
+                paddingLeft + x + rootView.measuredWidth,
                 rootView.measuredHeight
             )
-            width += rootView.measuredWidth
-            totalWidth += rootView.measuredWidth
-            height = maxOf(heightUsed, rootView.measuredHeight)
+            x += rootView.measuredWidth
+            y = maxOf(heightUsed, rootView.measuredHeight)
         }
 
         // Second row
-        width = 0
-        var secondRowHeight = 0
-        for (position in firstRowItemCount until state.itemCount) {
+        x = 0
+        for (position in getFirstRowItemCount() until state.itemCount) {
 
             val rootView = recycler.getViewForPosition(position)
             addView(rootView)
@@ -143,21 +139,18 @@ class MainLayoutManager(context: Context) : LinearLayoutManager(context) {
             measureChildWithMargins(rootView, 0, 0)
             layoutDecoratedWithMargins(
                 rootView,
-                width,
-                height,
-                paddingLeft + width + rootView.measuredWidth,
-                height + rootView.measuredHeight
+                x,
+                y,
+                paddingLeft + x + rootView.measuredWidth,
+                y + rootView.measuredHeight
             )
-            width += rootView.measuredWidth
-            secondRowHeight = maxOf(heightUsed, rootView.measuredHeight)
+            x += rootView.measuredWidth
         }
-        totalWidth = maxOf(totalWidth, width)
 
         recycler.scrapList.forEach {
             recycler.recycleView(it.itemView)
         }
 
-        totalHeight = height + secondRowHeight
     }
 
 }

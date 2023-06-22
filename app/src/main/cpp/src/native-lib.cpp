@@ -11,15 +11,15 @@ constexpr int kSampleRate = 44100;
 constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
+
 std::shared_ptr<EnvelopeSegmentCache> amplitudeEnvelopeSegmentCache;
 std::shared_ptr<EnvelopeSegmentCache> frequencyEnvelopeSegmentCache;
-
 std::shared_ptr<AudioGenerator> audioGenerator;
 
-extern "C" JNIEXPORT void JNICALL
 /**
- * Initializes the sound generator.
+ * Clears the envelope caches and creates an audio generator
  */
+extern "C" JNIEXPORT void JNICALL
 Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_init(
         JNIEnv *env,
         jclass clazz
@@ -31,6 +31,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_init(
             kSampleRate
     );
 }
+
 
 extern "C" JNIEXPORT void JNICALL
 /**
@@ -112,7 +113,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL
  * @return An array with the min value of the graph at the first index and
  *         the max value of the graph at the second index.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_fillBufferWithGraph(
         JNIEnv *env,
         jclass clazz,
         jobject buffer,
@@ -170,6 +171,32 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getGraph(
     return min_max;
 }
 
+extern "C" JNIEXPORT jfloatArray JNICALL
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getMinMax(
+        JNIEnv *env,
+        jclass clazz,
+        jobject envelopeTypeEnum,
+        jint column
+) {
+    // Get the envelope
+    int envelopeType = getEnumValue(env, envelopeTypeEnum);
+    std::shared_ptr<Envelope> envelope;
+    if (envelopeType == EnvelopeType::AMPLITUDE) {
+        envelope = amplitudeEnvelopeSegmentCache->get_envelope_segment(column);
+    } else {
+        // envelopeType == EnvelopeType::FREQUENCY
+        envelope = frequencyEnvelopeSegmentCache->get_envelope_segment(column);
+    }
+
+    // Return the min and max
+    jfloatArray min_max = env->NewFloatArray(2);
+    auto minY = static_cast<float>(envelope->getMin());
+    auto maxY = static_cast<float>(envelope->getMax());
+    jfloat mm[2]{minY, maxY};
+    env->SetFloatArrayRegion(min_max, 0, 2, mm);
+    return min_max;
+}
+
 extern "C" JNIEXPORT jint JNICALL
 /**
  * Gets the total number of envelope_segments.
@@ -177,18 +204,18 @@ extern "C" JNIEXPORT jint JNICALL
  *
  * @return The total number of envelope_segments.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumEnvelopes(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumEnvelopeSegments(
         JNIEnv *env,
         jclass clazz
 ) {
     return static_cast<jint>(
             amplitudeEnvelopeSegmentCache->get_num_envelope_segments() +
-                    frequencyEnvelopeSegmentCache->get_num_envelope_segments()
-            );
+            frequencyEnvelopeSegmentCache->get_num_envelope_segments()
+    );
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumAmplitudeEnvelopes(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getNumAmplitudeEnvelopeSegments(
         JNIEnv *env,
         jclass clazz
 ) {
@@ -273,7 +300,7 @@ extern "C" JNIEXPORT void JNICALL
  *                          construct the corresponding function in the
  *                          functionArray.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addFrequencyEnvelopeSegment(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addFrequencyEnvelopeSegmentArguments(
         JNIEnv *env,
         jclass clazz,
         jobjectArray functionEnumArray,
@@ -301,7 +328,7 @@ extern "C" JNIEXPORT void JNICALL
  *                          construct the corresponding function in the
  *                          functionArray.
  */
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addAmplitudeEnvelopeSegment(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addAmplitudeEnvelopeSegmentArguments(
         JNIEnv *env,
         jclass clazz,
         jobjectArray functionEnumArray,
@@ -319,7 +346,7 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_addAmplitudeEnvelopeSegmen
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getEnvelopeType(
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getEnvelopeSegmentType(
         JNIEnv *env,
         jclass clazz,
         jint index
@@ -370,7 +397,8 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getColumnNumber(
     if (index <= amplitudeEnvelopeSegmentCache->get_num_envelope_segments()) {
         column = index;
     } else {
-        column = index - static_cast<jint>(amplitudeEnvelopeSegmentCache->get_num_envelope_segments() + 1);
+        column = index -
+                 static_cast<jint>(amplitudeEnvelopeSegmentCache->get_num_envelope_segments() + 1);
     }
     return column;
 }

@@ -1,10 +1,13 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.util
 
 import android.content.Context
 import java.io.*
 
 private const val NUM_BACKUPS = 2
 
+/**
+ * A utility for saving files with backups.
+ */
 class FileUtil {
 
     companion object {
@@ -143,7 +146,7 @@ class FileUtil {
                     context.openFileInput(fileSave).use { fileInputStream ->
                         ObjectInputStream(fileInputStream).use { objectInputStream ->
                             val n = objectInputStream.readInt()
-                            for (i in 0..n) {
+                            for (i in 0 until n) {
                                 @Suppress("UNCHECKED_CAST")
                                 t.add(objectInputStream.readObject() as T)
                             }

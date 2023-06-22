@@ -1,10 +1,12 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.view
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import io.fourth_finger.sound_sculptor.R
+import io.fourth_finger.sound_sculptor.util.drawBorder
 import kotlin.math.roundToInt
 
 open class MainView(

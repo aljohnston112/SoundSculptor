@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <io.fourth_finger.sound_sculptor.AddFunctionView
+    <io.fourth_finger.sound_sculptor.view.AddFunctionView
         android:id="@+id/function_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -6,44 +6,57 @@
     app:startDestination="@id/titleFragment">
 
     <fragment
-        android:id="@+id/envelopeFragment"
-        android:name="io.fourth_finger.sound_sculptor.EnvelopeFragment"
-        android:label="fragment_envelope"
-        tools:layout="@layout/fragment_envelope" >
-        <argument
-            android:name="IsAmplitude"
-            app:argType="boolean"
-            android:defaultValue="true" />
-    </fragment>
-    <fragment
         android:id="@+id/titleFragment"
-        android:name="io.fourth_finger.sound_sculptor.TitleFragment"
+        android:name="io.fourth_finger.sound_sculptor.fragment.TitleFragment"
         android:label="fragment_title"
         tools:layout="@layout/fragment_title" >
+
         <action
-            android:id="@+id/action_titleFragment_to_envelopeFragment"
-            app:destination="@id/envelopeFragment" />
-        <action
-            android:id="@+id/action_titleFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
+            android:id="@+id/action_titleFragment_to_envelopeListFragment"
+            app:destination="@id/envelopeListFragment" />
+
     </fragment>
+
     <fragment
-        android:id="@+id/mainFragment"
-        android:name="io.fourth_finger.sound_sculptor.EnvelopeFragment"
-        android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        android:id="@+id/envelopeListFragment"
+        android:name="io.fourth_finger.sound_sculptor.fragment.EnvelopeListFragment"
+        android:label="EnvelopeListFragment"
+        tools:layout="@layout/fragment_envelope_list">
+
         <action
-            android:id="@+id/action_mainFragment_to_envelopeSegmentFragment"
-            app:destination="@id/envelopeSegmentFragment" />
+            android:id="@+id/action_envelopeListFragment_to_envelopeFragment"
+            app:destination="@id/envelopeFragment" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/envelopeFragment"
+        android:name="io.fourth_finger.sound_sculptor.fragment.EnvelopeFragment"
+        android:label="fragment_envelope"
+        tools:layout="@layout/fragment_main">
+
+        <argument
+            android:name="envelopeName"
+            android:defaultValue="null"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_envelopeFragment_to_envelopeSegmentFragment"
+            app:destination="@id/envelopeSegmentFragment" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/envelopeSegmentFragment"
-        android:name="io.fourth_finger.sound_sculptor.EnvelopeSegmentFragment"
+        android:name="io.fourth_finger.sound_sculptor.fragment.EnvelopeSegmentFragment"
         android:label="fragment_envelope_segment"
         tools:layout="@layout/fragment_envelope_segment" >
+
         <argument
             android:name="isAmplitude"
             app:argType="boolean"
             android:defaultValue="true" />
+
     </fragment>
+
 </navigation>

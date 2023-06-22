@@ -1,4 +1,4 @@
-package io.fourth_finger.sound_sculptor
+package io.fourth_finger.sound_sculptor.data_class
 
 import java.io.Serializable
 

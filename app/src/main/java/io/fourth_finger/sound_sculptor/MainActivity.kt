@@ -5,7 +5,9 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import io.fourth_finger.sound_sculptor.databinding.ActivityMainBinding
 
-
+/**
+ * The main activity hosting the main app fragments
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -20,9 +22,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        // Used to load the 'sound_sculptor' library on application startup.
         init {
             System.loadLibrary("sound_sculptor")
         }
     }
+
 }

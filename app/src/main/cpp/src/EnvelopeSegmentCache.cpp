@@ -16,11 +16,11 @@ void EnvelopeSegmentCache::push_back_envelope_segment(
 }
 
 int64_t EnvelopeSegmentCache::size_of_combined_envelopes(const int column) {
-    return envelope_segments.at(index)->size();
+    return envelope_segments.at(column)->size();
 }
 
 std::shared_ptr<Envelope> EnvelopeSegmentCache::get_envelope_segment(const int column) {
-    return envelope_segments.at(index);
+    return envelope_segments.at(column);
 }
 
 int64_t EnvelopeSegmentCache::get_num_envelope_segments() {

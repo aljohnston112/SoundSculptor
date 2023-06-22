@@ -28,6 +28,9 @@
     <string name="end">End</string>
     <string name="time">Time(Seconds)</string>
     <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="create_new">Create new</string>
+    <string name="envelopes">Envelopes</string>
 
 
 </resources>
