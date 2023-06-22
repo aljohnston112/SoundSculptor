@@ -133,6 +133,7 @@ class MainRecyclerViewAdapter(
                 ViewHolderType.AMPLITUDE -> Envelope.EnvelopeType.AMPLITUDE
                 else -> Envelope.EnvelopeType.FREQUENCY
             }
+            holder.functionView.setTypeAndColumn(envelopeType, column)
 
             // TODO this should update the minMax and then dispatch the update so the graph can be drawn
             when (functionViewType) {

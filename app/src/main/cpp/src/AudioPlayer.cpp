@@ -1,4 +1,5 @@
 #include "AudioPlayer.h"
+#include <jni.h>
 
 AudioPlayer::AudioPlayer(
         std::shared_ptr<AudioGenerator> sineWaveGenerator,

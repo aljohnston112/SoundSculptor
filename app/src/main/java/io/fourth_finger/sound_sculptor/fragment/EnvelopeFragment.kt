@@ -15,6 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import io.fourth_finger.sound_sculptor.data_class.Envelope
 import io.fourth_finger.sound_sculptor.MainApplication
@@ -22,8 +23,11 @@ import io.fourth_finger.sound_sculptor.MainLayoutManager
 import io.fourth_finger.sound_sculptor.adapter.MainRecyclerViewAdapter
 import io.fourth_finger.sound_sculptor.R
 import io.fourth_finger.sound_sculptor.databinding.FragmentMainBinding
+import io.fourth_finger.sound_sculptor.startPlaying
+import io.fourth_finger.sound_sculptor.stopPlaying
 import io.fourth_finger.sound_sculptor.view_model.EnvelopeViewModel
 import io.fourth_finger.sound_sculptor.view_model.EnvelopeViewModelFactory
+import java.nio.file.FileAlreadyExistsException
 
 /**
  * A fragment for building a frequency and amplitude envelope out of envelope segments.
@@ -60,6 +64,8 @@ class EnvelopeFragment : Fragment() {
                     binding.mainRecyclerView.adapter?.notifyDataSetChanged()
                 }
             }
+        } else {
+            viewModel.clearEnvelopes()
         }
 
     }
@@ -85,6 +91,19 @@ class EnvelopeFragment : Fragment() {
         // Set up recycler view
         binding.mainRecyclerView.layoutManager = MainLayoutManager(requireContext())
         binding.mainRecyclerView.adapter = MainRecyclerViewAdapter(onCreateNewEnvelopeSegment)
+
+        binding.FABPlayPause.setOnClickListener {
+            val fab = (it as ExtendedFloatingActionButton)
+            val text = fab.text.toString()
+            if (text == requireContext().getString(R.string.play)) {
+                fab.text = requireContext().getString(R.string.pause)
+                startPlaying()
+            } else{
+                fab.text = requireContext().getString(R.string.play)
+                stopPlaying()
+            }
+        }
+
     }
 
     /**
@@ -102,7 +121,7 @@ class EnvelopeFragment : Fragment() {
 
             val onSaveButtonClicked: (String?) -> Unit =  {
                 try {
-                    viewModel.trySave(requireContext(), it)
+                    viewModel.trySave(requireContext(), it, args.exists)
                 } catch (e: FileAlreadyExistsException) {
                     Toast.makeText(
                         context,

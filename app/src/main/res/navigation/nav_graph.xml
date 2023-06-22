@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_envelopeFragment_to_envelopeSegmentFragment"
             app:destination="@id/envelopeSegmentFragment" />
+        <argument
+            android:name="exists"
+            app:argType="boolean" />
 
     </fragment>
 

@@ -20,6 +20,8 @@ class EnvelopeViewModel(
 
     private var envelopeSegmentCache: EnvelopeSegmentCache = EnvelopeSegmentCache()
 
+    private var loaded = false
+
     /**
      * Loads an envelope from the repository and sends it to the JNI.
      * TODO The recycler view adapter should pick up on these changes
@@ -29,20 +31,21 @@ class EnvelopeViewModel(
      *                         The boolean parameter represents whether the envelope was loaded or not.
      */
     fun loadEnvelope(context: Context, envelopeName: String, onEnvelopeLoaded: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            init()
-            
-            val envelope = envelopeRepository.loadEnvelope(context, envelopeName)
-            val amplitudeArguments = envelope?.amplitudeEnvelopeArguments
-            val frequencyArguments = envelope?.frequencyEnvelopeArguments
+        if(!loaded) {
+            viewModelScope.launch {
+                init()
 
-            var loaded = false
-            if (amplitudeArguments != null && frequencyArguments != null) {
-                loadArguments(amplitudeArguments, frequencyArguments)
-                loaded = true
+                val envelope = envelopeRepository.loadEnvelope(context, envelopeName)
+                val amplitudeArguments = envelope?.amplitudeEnvelopeArguments
+                val frequencyArguments = envelope?.frequencyEnvelopeArguments
+
+                if (amplitudeArguments != null && frequencyArguments != null) {
+                    loadArguments(amplitudeArguments, frequencyArguments)
+                    loaded = true
+                }
+
+                onEnvelopeLoaded(loaded)
             }
-            
-            onEnvelopeLoaded(loaded)
         }
     }
 
@@ -82,9 +85,9 @@ class EnvelopeViewModel(
      *
      * @param name The name to save the envelope under.
      */
-    fun trySave(context: Context, name: String?) {
+    fun trySave(context: Context, name: String?, exists: Boolean) {
         val names = envelopeRepository.envelopeNames.value ?: setOf()
-        if (name != null && !names.contains(name)) {
+        if (name != null && (!names.contains(name) || exists)) {
             val amplitudeEnvelope = envelopeSegmentCache.getAmplitudeEnvelopeArguments()
             val frequencyEnvelope = envelopeSegmentCache.getFrequencyEnvelopeArguments()
             viewModelScope.launch {
@@ -131,6 +134,12 @@ class EnvelopeViewModel(
                 EnvelopeArguments(functions, arrayOf(functionArgs))
             )
         }
+    }
+
+    fun clearEnvelopes() {
+        io.fourth_finger.sound_sculptor.clearEnvelopes()
+        envelopeSegmentCache = EnvelopeSegmentCache()
+        loaded = false
     }
 
 }

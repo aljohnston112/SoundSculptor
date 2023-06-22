@@ -65,6 +65,11 @@ class FunctionView(
         textPaint.color = Color.BLACK
     }
 
+    fun setTypeAndColumn(envelopeType: Envelope.EnvelopeType, column: Int){
+        this.envelopeType = envelopeType
+        this.column = column
+    }
+
     /**
      * Called when a new minMax is available.
      *
@@ -81,9 +86,8 @@ class FunctionView(
      * Fills the underlying buffer with the envelope segment graph.
      */
     private fun fillBuffer() {
-        verifyValidPosition()
         if (width > 0) {
-
+            envelopePath.rewind()
             // Load the envelope points into a buffer
             if (directFloatBuffer.capacity() != width * 4) {
                 directFloatBuffer = ByteBuffer.allocateDirect(
@@ -118,15 +122,7 @@ class FunctionView(
 
     }
 
-    /**
-     * @return True if this view contains data the corresponds to a valid envelope segment else false.
-     */
-    private fun verifyValidPosition() {
-        assert(isValidPosition(envelopeType, column))
-    }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        verifyValidPosition()
 
         // Want to keep height
         val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)

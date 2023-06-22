@@ -46,14 +46,14 @@ class EnvelopeListFragment : Fragment() {
         binding.recyclerViewEnvelopeList.adapter = EnvelopeListRecyclerViewAdapter(listOf()){
             // Navigate to the envelope selected by the user
             view.findNavController().navigate(
-                EnvelopeListFragmentDirections.actionEnvelopeListFragmentToEnvelopeFragment(it)
+                EnvelopeListFragmentDirections.actionEnvelopeListFragmentToEnvelopeFragment(true, it)
             )
         }
 
         binding.FABCreateNew.setOnClickListener{
             // Navigate to a blank envelope
             view.findNavController().navigate(
-                EnvelopeListFragmentDirections.actionEnvelopeListFragmentToEnvelopeFragment()
+                EnvelopeListFragmentDirections.actionEnvelopeListFragmentToEnvelopeFragment(false)
             )
         }
 

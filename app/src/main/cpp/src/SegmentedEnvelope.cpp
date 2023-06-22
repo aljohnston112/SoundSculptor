@@ -12,13 +12,15 @@ SegmentedEnvelope::SegmentedEnvelope(
 }
 
 bool SegmentedEnvelope::nextDouble(double *d) {
-    bool currentEnvelopeDone = envelopes.at(currentIndex)->nextDouble(d);
     bool done = false;
-    if (currentEnvelopeDone) {
-        currentIndex++;
-        if (currentIndex >= envelopes.size()) {
-            currentIndex = 0;
-            done = true;
+    if (!envelopes.empty()) {
+        bool currentEnvelopeDone = envelopes.at(currentIndex)->nextDouble(d);
+        if (currentEnvelopeDone) {
+            currentIndex++;
+            if (currentIndex >= envelopes.size()) {
+                currentIndex = 0;
+                done = true;
+            }
         }
     }
     return done;

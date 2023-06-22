@@ -31,6 +31,8 @@ external fun addFrequencyEnvelopeSegmentArguments(
     functionArguments: Array<DoubleArray>
 )
 
+external fun clearEnvelopes()
+
 /**
  * @return The number of amplitude envelope segments.
  */

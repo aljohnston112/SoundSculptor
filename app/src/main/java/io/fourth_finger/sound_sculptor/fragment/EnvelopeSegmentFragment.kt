@@ -64,12 +64,11 @@ class EnvelopeSegmentFragment : Fragment() {
                     position: Int,
                     id: Long
                 ) {
-                    TODO("Not yet implemented")
+                    // TODO
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
                     // TODO should not happen
-                    TODO("Not yet implemented")
                 }
 
             }

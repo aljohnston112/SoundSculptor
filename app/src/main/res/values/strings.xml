@@ -31,6 +31,7 @@
     <string name="name">Name</string>
     <string name="create_new">Create new</string>
     <string name="envelopes">Envelopes</string>
+    <string name="pause">Pause</string>
 
 
 </resources>

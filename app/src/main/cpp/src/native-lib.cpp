@@ -12,8 +12,8 @@ constexpr int kChannelCount = 1;
 
 std::unique_ptr<AudioPlayer> audioPlayer;
 
-std::shared_ptr<EnvelopeSegmentCache> amplitudeEnvelopeSegmentCache;
-std::shared_ptr<EnvelopeSegmentCache> frequencyEnvelopeSegmentCache;
+std::unique_ptr<EnvelopeSegmentCache> amplitudeEnvelopeSegmentCache;
+std::unique_ptr<EnvelopeSegmentCache> frequencyEnvelopeSegmentCache;
 std::shared_ptr<AudioGenerator> audioGenerator;
 
 /**
@@ -32,6 +32,16 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_init(
     );
 }
 
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_clearEnvelopes(
+        JNIEnv *env,
+        jclass clazz
+) {
+    amplitudeEnvelopeSegmentCache = std::make_unique<EnvelopeSegmentCache>();
+    frequencyEnvelopeSegmentCache = std::make_unique<EnvelopeSegmentCache>();
+}
 
 extern "C" JNIEXPORT void JNICALL
 /**
@@ -357,11 +367,11 @@ Java_io_fourth_1finger_sound_1sculptor_JNIFunctionsKt_getEnvelopeSegmentType(
         throw std::invalid_argument("Index out of bounds");
     }
     jclass envelopeTypeClass = env->FindClass(
-            "io/fourth_finger/sound_sculptor/Envelope$EnvelopeType");
+            "io/fourth_finger/sound_sculptor/data_class/Envelope$EnvelopeType");
     jmethodID valuesMethod = env->GetStaticMethodID(
             envelopeTypeClass,
             "values",
-            "()[Lio/fourth_finger/sound_sculptor/Envelope$EnvelopeType;"
+            "()[Lio/fourth_finger/sound_sculptor/data_class/Envelope$EnvelopeType;"
     );
     auto envelopeTypeArray = (jobjectArray) env->CallStaticObjectMethod(envelopeTypeClass,
                                                                         valuesMethod);
