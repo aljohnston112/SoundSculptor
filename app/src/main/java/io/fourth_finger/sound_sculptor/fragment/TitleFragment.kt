@@ -15,7 +15,6 @@ import io.fourth_finger.sound_sculptor.databinding.FragmentTitleBinding
 class TitleFragment : Fragment(R.layout.fragment_title) {
 
     private var _binding: FragmentTitleBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +39,8 @@ class TitleFragment : Fragment(R.layout.fragment_title) {
         // Navigate to the list of envelopes
         binding.buttonMain.setOnClickListener{
             view.findNavController().navigate(
-                TitleFragmentDirections.actionTitleFragmentToEnvelopeListFragment()
+                //TitleFragmentDirections.actionTitleFragmentToEnvelopeListFragment()
+            TitleFragmentDirections.actionTitleFragmentToGraphFragment()
             )
         }
     }

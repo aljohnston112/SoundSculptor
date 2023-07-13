@@ -7,6 +7,7 @@
     tools:context=".fragment.GraphFragment">
 
     <io.fourth_finger.sound_sculptor.view.GraphDrawer
+        android:id="@+id/graph_drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

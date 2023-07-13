@@ -32,6 +32,7 @@
     <string name="create_new">Create new</string>
     <string name="envelopes">Envelopes</string>
     <string name="pause">Pause</string>
+    <string name="add_generator">Add generator</string>
 
 
 </resources>

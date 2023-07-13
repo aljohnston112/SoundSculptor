@@ -1,7 +1,7 @@
 #ifndef SOUNDSCULPTOR_AUDIOPLAYER_H
 #define SOUNDSCULPTOR_AUDIOPLAYER_H
 
-#include "/oboe/Oboe.h"
+#include "oboe/Oboe.h"
 #include <cmath>
 #include "../include/ASREnvelope.h"
 #include "../include/SineWaveGenerator.h"

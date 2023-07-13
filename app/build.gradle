@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'io.fourth_finger.sound_sculptor'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "io.fourth_finger.sound_sculptor"
         minSdk 26
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -57,10 +57,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.oboe:oboe:1.7.0'
     implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.core:core-ktx:+'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
 
     testImplementation 'junit:junit:4.13.2'
 
